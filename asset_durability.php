@@ -125,6 +125,7 @@ $assetList = $assetQuery->fetchAll(PDO::FETCH_ASSOC);
             <div class="overflow-y-auto" style="max-height: 500px;">
                 <table class="w-full text-left border-collapse">
                     <thead>
+                        <!-- Test -->
                         <tr class="bg-gray-200">
                             <th class="border px-4 py-2">Asset ID</th>
                             <th class="border px-4 py-2">Asset Name</th>
