@@ -18,8 +18,12 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 $username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
 
 // Fetch asset data from the database
-$stmt = $conn->query("SELECT asset_id, category_id, last_inspected, disposal_date FROM asset_records");
+$stmt = $conn->query("SELECT * FROM asset_records ar JOIN categories c ON ar.category_id = c.id JOIN sub_categories sc ON ar.sub_category_id = sc.id JOIN room_types rt ON ar.room_type_id = rt.id JOIN rooms r ON ar.room_id = r.id JOIN persons_in_charge pic ON ar.person_in_charge_id = pic.id;
+");
 $assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$categoryQuery = $conn->query("SELECT name FROM categories;");
+$categories = $categoryQuery->fetchAll(PDO::FETCH_ASSOC);
 
 
 ?>
@@ -158,9 +162,9 @@ $assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <select id="categoryDropdown" class="ml-2 p-2 border rounded-md">
                     <option value="all">All Categories</option>
                     <?php
-                    // Get distinct categories for dropdown
-                    $categories = array_unique(array_column($assets, 'category_id'));
-                    foreach ($categories as $category) {
+                    // Extract unique category names
+                    $category_names = array_unique(array_column($categories, 'name'));
+                    foreach ($category_names as $category) {
                         echo "<option value='$category'>$category</option>";
                     }
                     ?>
@@ -182,10 +186,10 @@ $assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($assets as $asset): ?>
+                        <?php foreach ($categories as $category): ?>
                             <tr>
-                                <td class="border px-4 py-2"><?= htmlspecialchars($asset['asset_id']) ?></td>
-                                <td class="border px-4 py-2"><?= htmlspecialchars($asset['category_id']) ?></td> <!-- Update as needed -->
+                                <td class="border px-4 py-2"><?= htmlspecialchars($category['asset_id']) ?></td>
+                                <td class="border px-4 py-2"><?= htmlspecialchars($category['name']) ?></td> <!-- Update as needed -->
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -195,7 +199,7 @@ $assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <!-- Chart.js Script -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const ctx = document.getElementById('durabilityChart').getContext('2d');
         
@@ -251,6 +255,6 @@ $assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             durabilityChart.data.datasets[0].data = filteredData;
             durabilityChart.update();
         });
-    </script>
+    </script> -->
 </body>
 </html>

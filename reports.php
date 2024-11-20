@@ -17,16 +17,11 @@ function fetchPersonsInCharge()
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Fetch session data
 $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 
-// Fetch username from the database
-$stmt = $conn->prepare("SELECT username FROM users WHERE id = ?");
-$stmt->execute([$user_id]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-$username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
-
+// Get list of persons in charge
 $persons_in_charge = fetchPersonsInCharge();
 
 // Generate PDF
@@ -34,115 +29,120 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['person_in_charge'])) 
     $person_id = intval($_POST['person_in_charge']);
 
     // Query for "For Disposal" items
-    $stmt = $conn->prepare("SELECT categories.name AS category, 
-                                   sub_categories.name AS sub_category, 
-                                   assets.name AS asset,
-                                   room_types.name AS room_type, 
-                                   rooms.name AS room, 
-                                   persons_in_charge.name AS person_in_charge,
-                                   asset_records.comments AS comments
-                            FROM asset_records
-                            JOIN assets ON asset_records.asset_id = assets.id
-                            JOIN categories ON assets.category_id = categories.id
-                            JOIN sub_categories ON assets.sub_category_id = sub_categories.id
-                            LEFT JOIN rooms ON asset_records.room_id = rooms.id
-                            LEFT JOIN room_types ON rooms.room_type_id = room_types.id
-                            LEFT JOIN persons_in_charge ON asset_records.person_in_charge_id = persons_in_charge.id
-                            WHERE persons_in_charge.id = ? AND asset_records.disposed = 1");
-    $stmt->execute([$person_id]);
+    $stmt = $conn->prepare("SELECT 
+        categories.name AS category, 
+        sub_categories.name AS sub_category, 
+        assets.name AS brand,
+        asset_records.unique_name AS asset,
+        room_types.name AS room_type, 
+        rooms.name AS room, 
+        persons_in_charge.name AS person_in_charge,
+        asset_records.comments AS comments
+    FROM asset_records
+    LEFT JOIN assets ON asset_records.asset_id = assets.id
+    LEFT JOIN categories ON assets.category_id = categories.id
+    LEFT JOIN sub_categories ON assets.sub_category_id = sub_categories.id
+    LEFT JOIN rooms ON asset_records.room_id = rooms.id
+    LEFT JOIN room_types ON rooms.room_type_id = room_types.id
+    LEFT JOIN persons_in_charge ON asset_records.person_in_charge_id = persons_in_charge.id
+    WHERE persons_in_charge.id = :person_id AND asset_records.disposed = 1");
+    $stmt->bindParam(':person_id', $person_id, PDO::PARAM_INT);
+    $stmt->execute();
     $forDisposalAssets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($forDisposalAssets)) {
-        // No disposal items found
         $_SESSION['error'] = "No disposal items found for the selected person in charge.";
         header('Location: reports.php');
         exit();
     }
 
     // Create PDF
-    $pdf = new TCPDF();
+    $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
+    $pdf->SetCreator(PDF_CREATOR);
+    $pdf->SetAuthor('Your Name');
+    $pdf->SetTitle('Disposed Assets Report');
+    $pdf->SetMargins(15, 20, 15);
+    $pdf->SetAutoPageBreak(TRUE, 20);
     $pdf->AddPage();
+
+    // Header with Logos
+    $logoLeft = 'images/OSJLOGO.png';
+    $logoRight = 'images/DAZSMALOGO.png';
+
+    $pdf->Image($logoLeft, 15, 10, 30);
+    $pdf->Image($logoRight, 245, 10, 30);
+    $pdf->SetFont('helvetica', 'B', 16);
+    $pdf->Cell(0, 10, 'Don Antonio De Zuzuarregui Sr. Memorial Academy Incorporated', 0, 1, 'C');
     $pdf->SetFont('helvetica', '', 12);
+    $pdf->Cell(0, 5, 'St. Anthony, Brgy. Inarawan, Antipolo City', 0, 1, 'C');
+    $pdf->Ln(15); // Add space
 
-    $logoLeft = 'images/OSJLOGO.png'; // Replace with the actual path to the left logo
-    $logoRight = 'images/DAZSMALOGO.png'; // Replace with the actual path to the right logo
-
-    $pdf->Image($logoLeft, 10, 10, 30); // Adjust the x, y, and size as necessary
-    $pdf->Image($logoRight, 170, 10, 30); // Adjust the x, y, and size as necessary
-    $pdf->Cell(0, 15, 'Don Antonio De Zuzuarregui Sr. Memorial Academy Incorporated', 0, 1, 'C');
-    $pdf->Cell(0, 0, 'St. Anthony, Brgy. Inarawan, Antipolo City', 0, 1, 'C');
-    $pdf->Ln(20); // Add some space after the title
-
-    // Person In Charge Info
-    $pdf->Cell(0, 10, 'Person In Charge: ' . htmlspecialchars($forDisposalAssets[0]['person_in_charge']), 0, 1);
+    // Person in Charge Info (decode HTML entities)
+    $pdf->SetFont('helvetica', 'B', 12);
+    $person_in_charge_name = html_entity_decode($forDisposalAssets[0]['person_in_charge'], ENT_QUOTES, 'UTF-8');
+    $pdf->Cell(0, 10, 'Person In Charge: ' . $person_in_charge_name, 0, 1);
     $pdf->Ln(5);
 
-    // Space between sections
-    $pdf->Ln(10);
-
-    // "For Disposal" section
-    $pdf->SetFont('helvetica', 'B', 12);
-    $pdf->Cell(190, 7, 'Disposed Assets', 1, 1, 'C');
+    // Table Header
     $pdf->SetFont('helvetica', 'B', 10);
-    $pdf->Cell(30, 7, 'Category', 1);
-    $pdf->Cell(30, 7, 'Sub-Category', 1);
-    $pdf->Cell(30, 7, 'Asset', 1);
-    $pdf->Cell(30, 7, 'Room Type', 1);
-    $pdf->Cell(35, 7, 'Room', 1);
-    $pdf->Cell(35, 7, 'Comments', 1);
-    $pdf->Ln();
+    $pdf->SetFillColor(220, 220, 220);
+    $pdf->Cell(30, 10, 'Category', 1, 0, 'C', true);
+    $pdf->Cell(30, 10, 'Sub-Category', 1, 0, 'C', true);
+    $pdf->Cell(30, 10, 'Brand', 1, 0, 'C', true);
+    $pdf->Cell(30, 10, 'Asset', 1, 0, 'C', true);
+    $pdf->Cell(35, 10, 'Room Type', 1, 0, 'C', true);
+    $pdf->Cell(35, 10, 'Room', 1, 0, 'C', true);
+    $pdf->Cell(50, 10, 'Comments', 1, 1, 'C', true);
 
-    $pdf->SetFont('helvetica', '', 8);
+    // Table Content with Alternating Row Colors
+    $pdf->SetFont('helvetica', '', 9);
+    $rowColor = false; // Alternating row color
     foreach ($forDisposalAssets as $asset) {
-        $pdf->Cell(30, 12, $asset['category'], 1);
-        $pdf->Cell(30, 12, $asset['sub_category'], 1);
-        $pdf->Cell(30, 12, $asset['asset'], 1);
-        $pdf->Cell(30, 12, $asset['room_type'], 1);
-        $pdf->Cell(35, 12, $asset['room'], 1);
-        $pdf->Cell(35, 12, $asset['comments'], 1);
-        $pdf->Ln();
+        $fillColor = $rowColor ? [245, 245, 245] : [255, 255, 255];
+        $pdf->SetFillColorArray($fillColor);
+
+        // Decode HTML entities for room and comments fields
+        $room = html_entity_decode($asset['room'], ENT_QUOTES, 'UTF-8');
+        $comments = html_entity_decode($asset['comments'], ENT_QUOTES, 'UTF-8');
+
+        // Manually replace &#039; with ' (to handle apostrophe)
+        $room = str_replace("&#039;", "'", $room);
+        $comments = str_replace("&#039;", "'", $comments);
+
+        // Debugging: Output the room and comments fields to verify
+        error_log("Room: " . $room);
+        error_log("Comments: " . $comments);
+
+        $pdf->Cell(30, 8, htmlspecialchars($asset['category']), 1, 0, 'C', true);
+        $pdf->Cell(30, 8, htmlspecialchars($asset['sub_category']), 1, 0, 'C', true);
+        $pdf->Cell(30, 8, htmlspecialchars($asset['brand']), 1, 0, 'C', true);
+        $pdf->Cell(30, 8, htmlspecialchars($asset['asset']), 1, 0, 'C', true);
+        $pdf->Cell(35, 8, htmlspecialchars($asset['room_type']), 1, 0, 'C', true);
+        $pdf->Cell(35, 8, htmlspecialchars($room), 1, 0, 'C', true);  // Decoded room
+        $pdf->Cell(50, 8, htmlspecialchars($comments), 1, 1, 'C', true); // Decoded comments
+
+        $rowColor = !$rowColor; // Toggle row color
     }
 
-    //Signatures
-    $pdf->SetFont('helvetica', 'B', 6);
-    $pdf->MultiCell(37, 20, 'Endorsed by: 
-     
-    
+    $pdf->Ln(15); // Space before signatures
 
+    // Signatures Section
+    $pdf->SetFont('helvetica', '', 10);
+    $pdf->SetFillColor(255, 255, 255);
+    $signatures = [
+        ['Endorsed by', 'Mr. Osmond B. Baylen', 'Principal'],
+        ['Checked by', 'Ms. Anna Liza M. Bernales', 'Accounting Assistant'],
+        ['Recommended by', 'Rev. Fr. Gerardo I. Yabyabin, OSJ', 'Treasurer'],
+        ['Approved by', 'Rev. Fr. Erwin B. Aguilar, OSJ', 'Director'],
+        ['Released by', 'Mrs. Lorna T. Villagracia', 'Cashier'],
+    ];
 
-    Mr. Osmond B. Baylen
-               Principal ', 1, 'L', false, 0, '', '', true, 0, false, true, 20, 'T', true);
-    $pdf->MultiCell(37, 20, 'Checked By: 
-     
-    
- 
-
-    Ms. Anna Liza M. Bernales
-         Accounting Assistant ', 1, 'L', false, 0, '', '', true, 0, false, true, 20, 'T', true);
-    $pdf->MultiCell(42, 20, 'Recommended By: 
-     
-    
-
-
-    Rev.Fr. Gerardo I. Yabyabin, OSJ
-                           Treasurer ', 1, 'L', false, 0, '', '', true, 0, false, true, 20, 'T', true);
-    $pdf->MultiCell(37, 20, 'Approved By: 
-     
-    
-
-
-     Rev.Fr. Erwin B. Aguilar, OSJ
-                          Director', 1, 'L', false, 0, '', '', true, 0, false, true, 20, 'T', true);
-    $pdf->MultiCell(37, 20, 'Released By: 
-     
-    
-
-
-    Mrs. Lorna T. Villagracia
-                      Cashier ', 1, 'L', false, 1, '', '', true, 0, false, true, 20, 'T', true);
+    foreach ($signatures as $signature) {
+        $pdf->MultiCell(50, 25, "{$signature[0]}:\n\n" . htmlspecialchars($signature[1]) . "\n{$signature[2]}", 1, 'C', false, 0, '', '', true);
+    }
 
     // Output PDF
-    $pdf->Output('report.pdf', 'I');
+    $pdf->Output('Disposed_Assets_Report.pdf', 'I');
     exit();
 }
 ?>

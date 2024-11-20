@@ -1,8 +1,8 @@
 <?php
 $host = 'localhost';
 $dbname = 'school_asset';
-$username = 'parsu';
-$password = '6!2FZd)]1.)Jn[pZ';
+$username = 'root';
+$password = '';
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
