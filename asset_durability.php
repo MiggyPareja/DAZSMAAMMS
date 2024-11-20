@@ -22,17 +22,22 @@ $categoryQuery = $conn->query("SELECT DISTINCT c.name FROM asset_records ar JOIN
 $categories = $categoryQuery->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch asset data for the chart (all categories by default)
-$chartQuery = $conn->query("SELECT c.name AS category_name, AVG(ABS(DATEDIFF(pr.date, ar.disposal_date))) AS avg_durability 
-                            FROM asset_records ar 
-                            LEFT JOIN categories c ON ar.category_id = c.id
-                            LEFT JOIN procurement_requests pr ON ar.person_in_charge_id = pr.person_in_charge_id
-                            WHERE ar.disposal_date IS NOT NULL 
-                            GROUP BY c.name;");
+$chartQuery = $conn->query("SELECT 
+    c.name AS category_name, 
+    COALESCE(AVG(ABS(DATEDIFF(pr.date, ar.disposal_date))), 0) AS avg_durability
+FROM 
+    categories c
+LEFT JOIN asset_records ar ON ar.category_id = c.id
+LEFT JOIN procurement_requests pr ON ar.person_in_charge_id = pr.person_in_charge_id
+    AND pr.status = 'Approved'
+GROUP BY 
+    c.name;");
 $chartData = $chartQuery->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch asset list for the table
-$assetQuery = $conn->query("SELECT ar.asset_id, c.name AS category_name FROM asset_records ar 
-                            JOIN categories c ON ar.category_id = c.id;");
+
+$assetQuery = $conn->query("SELECT ar.id, c.name AS category_name FROM asset_records ar 
+                            JOIN categories c ON ar.category_id = c.id
+                            GROUP BY ar.id;");
 $assetList = $assetQuery->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -109,7 +114,7 @@ $assetList = $assetQuery->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                 </select>
             </div>
-            <!-- Placeholder for Graph -->
+            <!-- Graph -->
             <div id="chart_div" style="width: 900px; height: 500px;"></div>
         </div>
 
@@ -127,7 +132,7 @@ $assetList = $assetQuery->fetchAll(PDO::FETCH_ASSOC);
                     <tbody>
                         <?php foreach ($assetList as $asset): ?>
                             <tr>
-                                <td class="border px-4 py-2"><?= htmlspecialchars($asset['asset_id']) ?></td>
+                                <td class="border px-4 py-2"><?= htmlspecialchars($asset['id']) ?></td>
                                 <td class="border px-4 py-2"><?= htmlspecialchars($asset['category_name']) ?></td>
                             </tr>
                         <?php endforeach; ?>
@@ -148,7 +153,7 @@ function drawChart() {
     var data = google.visualization.arrayToDataTable([
         ['Category', 'Average Durability (Days)'],
         <?php
-        // Generate the chart data PHP to JavaScript
+        
         foreach ($chartData as $chart) {
             echo "['" . $chart['category_name'] . "', " . $chart['avg_durability'] . "],";
         }
@@ -157,7 +162,7 @@ function drawChart() {
 
     var options = {
         title: 'Asset Durability by Category',
-        chartArea: {width: '65%', height: '80%'}, // Adjust chart area size
+        chartArea: {width: '65%', height: '80%'}, 
         hAxis: {
             title: 'Average Durability (Days)',
             minValue: 0
@@ -176,21 +181,21 @@ function drawChart() {
             easing: 'inAndOut',
             duration: 1000
         },
-        legend: { position: 'none' }, // Hide the legend if unnecessary
-        width: '100%',  // Set the chart to be 100% of its container
-        height: '100%'  // Set the chart to be 100% of its container
+        legend: { position: 'none' }, 
+        width: '100%',  
+        height: '100%'  
     };
 
     var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
     chart.draw(data, options);
 }
 
-// Redraw chart on category change
+
 document.getElementById('categoryDropdown').addEventListener('change', function () {
-    drawChart(); // Re-call the drawChart function when the category is changed
+    drawChart();
 });
 
-// Automatically resize the chart when the window is resized
+
 window.addEventListener('resize', function() {
     drawChart();
 });
