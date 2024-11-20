@@ -100,9 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             "\nRoom Type: " . htmlspecialchars($room_type_name) .
             "\nRoom: " . htmlspecialchars($room_name) .
             "\nAsset: " . htmlspecialchars($asset_name) .
-            "\nPerson In Charge: " . htmlspecialchars($person_in_charge_name) .
-            "\nComment: " . htmlspecialchars($comment) .
-            "\nLast Inspected: " . htmlspecialchars($timestamp);
+            "\nPerson In Charge: " . htmlspecialchars($person_in_charge_name);
             
 
         $qrCodeDir = 'qrcodes';
