@@ -1,0 +1,154 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f7f9fc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Menu Styling */
+.menu {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    width: 100%;
+    max-width: 800px;
+    position: relative;
+}
+
+/* Heading Styling */
+.menu h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+    text-align: center;
+}
+
+/* Buttons Styling */
+.circular-button,
+.back-button {
+    text-decoration: none;
+    color: #fff;
+    border-radius: 50px;
+    padding: 12px 24px;
+    margin: 10px 5px;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+}
+
+.circular-button {
+    background-color: #3498db;
+}
+
+.circular-button:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+.back-button {
+    background-color: #95a5a6;
+}
+
+.back-button:hover {
+    background-color: #7f8c8d;
+    transform: scale(1.05);
+}
+
+/* Table Styling */
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+}
+
+.user-table thead {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.user-table th,
+.user-table td {
+    padding: 12px;
+    text-align: left;
+}
+
+.user-table th {
+    font-size: 16px;
+}
+
+.user-table td {
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.user-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Action Button Styling */
+.edit-button,
+.delete-button {
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    margin: 0 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.edit-button {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.edit-button:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+.delete-button {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+.delete-button:hover {
+    background-color: #c0392b;
+    transform: scale(1.05);
+}
+
+/* Logout Button Styling */
+.logout-container {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.logout-button {
+    background-color: #e74c3c;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.logout-button:hover {
+    background-color: #c0392b;
+    transform: scale(1.05);
+}

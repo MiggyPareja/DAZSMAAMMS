@@ -1,0 +1,105 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/* Body Styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /*/background-color: #e3f2fd; /* Light blue background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 110vh;
+    background-size: Cover;
+    background-image: url('../../images/background (2).jpg');
+    background-position: center;
+    height: 100vh; /* 100% of the viewport height */
+}
+
+/* Login Container */
+.login-container {
+    background-color: #ffffff; /* White background for the form */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+    /* Heading Styling */
+    .login-container h2 {
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-size: 1.75rem;
+    }
+
+/* Error Message Styling */
+.error {
+    color: #e74c3c; /* Red color for error messages */
+    margin-bottom: 1rem;
+    font-size: 14px;
+}
+
+/* Form Styling */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Input Styling */
+input[type="text"],
+input[type="password"] {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 1rem;
+    font-size: 16px;
+    width: 100%;
+}
+
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder {
+        color: #999;
+    }
+
+/* Button Styling */
+button {
+    background-color: #3498db; /* Blue color for the button */
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+    button:hover {
+        background-color: #2980b9;
+        transform: scale(1.05);
+    }
+
+/* Show Password Toggle */
+.password-container {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    color: #3498db;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Disabled Button Styling */
+button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}

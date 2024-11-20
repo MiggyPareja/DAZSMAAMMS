@@ -1,0 +1,67 @@
+/* dispose_assets.css */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+.disposed-assets-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+td img.qr-code {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+}
+
+.back-button, .logout-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    color: #fff;
+    background-color: #007bff;
+    margin-top: 20px;
+}
+
+    .back-button:hover, .logout-button:hover {
+        background-color: #0056b3;
+    }
+
+.logout-container {
+    text-align: right;
+}

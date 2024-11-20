@@ -1,0 +1,118 @@
+/* add_user.css */
+
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* Form Container */
+.form-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+}
+
+    /* Form Title */
+    .form-container h2 {
+        margin-top: 0;
+        color: #333;
+    }
+
+    /* Form Fields */
+    .form-container input[type="text"],
+    .form-container input[type="password"],
+    .form-container select {
+        width: calc(100% - 20px);
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+
+    .form-container .password-container {
+        position: relative;
+    }
+
+        .form-container .password-container .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 14px;
+            color: #007BFF;
+        }
+
+    /* Buttons */
+    .form-container .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 10px; /* Space between buttons */
+        margin-top: 20px;
+    }
+
+    .form-container button,
+    .form-container .back-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .form-container button {
+        background-color: #007BFF;
+        color: #fff;
+    }
+
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+
+    .form-container .back-button {
+        background-color: #6c757d;
+        color: #fff;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 10px;
+    }
+
+        .form-container .back-button:hover {
+            background-color: #5a6268;
+        }
+
+/* Error Message */
+.error {
+    color: #FF0000;
+    margin: 10px 0;
+}
+
+/* Logout Button */
+.logout-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+    .logout-container .logout-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #dc3545;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+        .logout-container .logout-button:hover {
+            background-color: #c82333;
+        }

@@ -1,0 +1,207 @@
+/* Reset default margins and paddings */
+body, h1, h2, h3, p, ul, li, table {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* General body styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Container styling */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading styling */
+h2 {
+    color: #333;
+    font-size: 28px;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #007bff;
+    padding-bottom: 12px;
+}
+
+/* Form styling */
+form {
+    display: grid;
+    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* Label styling */
+label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+/* Dropdown and button styling */
+select, button {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+select:focus, button:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+select {
+    width: 100%;
+}
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Back to Dashboard button styling */
+.back-button {
+    display: inline-block;
+    margin-top: 10px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.back-button:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Table styling */
+.assets-table {
+    margin-top: 20px;
+}
+
+.assets-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.assets-table th, .assets-table td {
+    padding: 14px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.assets-table th {
+    background-color: #007bff;
+    color: #fff;
+    font-weight: 600;
+}
+
+.assets-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* QR code image styling */
+.qr-code {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+/* Action buttons styling */
+.action-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.transfer-button, .dispose-button, .delete-button, .inspect-button, {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.transfer-button {
+    background-color: #28a745;
+}
+
+.transfer-button:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+.dispose-button {
+    background-color: #ffc107;
+}
+
+.dispose-button:hover {
+    background-color: #e0a800;
+    transform: scale(1.05);
+}
+
+.delete-button {
+    background-color: #dc3545;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+    transform: scale(1.05);
+}
+
+.inspect-button {
+    background-color: #ffc107;
+}
+
+.inspect-button:hover {
+    background-color: #e0a800;
+    transform: scale(1.05);
+}
+
+/* Logout button styling */
+.logout-container {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.logout-button {
+    padding: 12px 24px;
+    background-color: #dc3545;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.logout-button:hover {
+    background-color: #c82333;
+    transform: scale(1.05);
+}
