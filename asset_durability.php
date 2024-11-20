@@ -35,8 +35,9 @@ GROUP BY
 $chartData = $chartQuery->fetchAll(PDO::FETCH_ASSOC);
 
 
-$assetQuery = $conn->query("SELECT ar.id, c.name AS category_name FROM asset_records ar 
+$assetQuery = $conn->query("SELECT ar.id, c.name AS category_name, a.name as asset_name FROM asset_records ar 
                             JOIN categories c ON ar.category_id = c.id
+                            JOIN assets a on ar.asset_id = a.id
                             GROUP BY ar.id;");
 $assetList = $assetQuery->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -120,12 +121,13 @@ $assetList = $assetQuery->fetchAll(PDO::FETCH_ASSOC);
 
         <!-- Asset List Section -->
         <div class="bg-white p-6 rounded-xl shadow-lg w-1/3">
-            <h2 class="text-lg font-semibold mb-4">Assets List</h2>
-            <div class="overflow-y-auto" style="max-height: 300px;">
+            <h2 class="text-lg font-semibold mb-1">Assets List</h2>
+            <div class="overflow-y-auto" style="max-height: 500px;">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-200">
                             <th class="border px-4 py-2">Asset ID</th>
+                            <th class="border px-4 py-2">Asset Name</th>
                             <th class="border px-4 py-2">Category</th>
                         </tr>
                     </thead>
@@ -133,6 +135,7 @@ $assetList = $assetQuery->fetchAll(PDO::FETCH_ASSOC);
                         <?php foreach ($assetList as $asset): ?>
                             <tr>
                                 <td class="border px-4 py-2"><?= htmlspecialchars($asset['id']) ?></td>
+                                <td class="border px-4 py-2"><?= htmlspecialchars($asset['asset_name']) ?></td>
                                 <td class="border px-4 py-2"><?= htmlspecialchars($asset['category_name']) ?></td>
                             </tr>
                         <?php endforeach; ?>
