@@ -94,29 +94,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['person_in_charge'])) 
     $pdf->SetAutoPageBreak(TRUE, 20);
     $pdf->AddPage();
 
-    // Header with Logos
+    // Enhanced Header with Logos and Background
     $logoLeft = 'images/OSJLOGO.png';
     $logoRight = 'images/DAZSMALOGO.png';
-    $pdf->Image($logoLeft, 15, 10, 30);
-    $pdf->Image($logoRight, 245, 10, 30);
-    $pdf->SetFont('helvetica', 'B', 16);
+    
+    // Set header background color
+    $pdf->SetFillColor(0, 56, 168); // Dark blue background
+    $pdf->Rect(0, 0, 297, 25, 'F'); // Full width background
+
+    // Add logos
+    $pdf->Image($logoLeft, 15, 5, 30);
+    $pdf->Image($logoRight, 245, 5, 30);
+
+    // Title and Address with centered alignment
+    $pdf->SetFont('helvetica', 'B', 18);
+    $pdf->SetTextColor(255, 255, 255); // White text
     $pdf->Cell(0, 10, 'Don Antonio De Zuzuarregui Sr. Memorial Academy Incorporated', 0, 1, 'C');
+    
     $pdf->SetFont('helvetica', '', 12);
     $pdf->Cell(0, 5, 'St. Anthony, Brgy. Inarawan, Antipolo City', 0, 1, 'C');
     $pdf->Ln(15);
 
     // Person in Charge Info
     $person_in_charge_name = html_entity_decode($forDisposalAssets[0]['person_in_charge'], ENT_QUOTES, 'UTF-8');
-    $pdf->SetFont('helvetica', 'B', 12);
+    $pdf->SetFont('helvetica', 'B', 14);
     $pdf->Cell(0, 10, 'Person In Charge: ' . $person_in_charge_name, 0, 1);
     $pdf->Ln(5);
 
-    // Table Header (dynamically generated based on selected fields)
+    // Table Header with Improved Design
     $pdf->SetFont('helvetica', 'B', 10);
-    $pdf->SetFillColor(220, 220, 220);
+    $pdf->SetFillColor(220, 220, 220); // Light gray header background
+    $pdf->SetTextColor(0, 0, 0); // Black text
 
     foreach ($selected_fields as $field) {
-        $pdf->Cell(30, 10, $field, 1, 0, 'C', true);
+        $pdf->Cell(30, 10, strtoupper($field), 1, 0, 'C', true);
     }
     $pdf->Ln();
 
@@ -141,9 +152,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['person_in_charge'])) 
     // Add space before signatures
     $pdf->Ln(15);
 
-    // Signatures Section
-    $pdf->SetFont('helvetica', '', 10);
-    $pdf->SetFillColor(255, 255, 255);
+    // Signatures Section with Styling
+    $pdf->SetFont('helvetica', '', 12);
+    $pdf->SetFillColor(255, 255, 255); // White background
+
     $signatures = [
         ['Endorsed by', 'Mr. Osmond B. Baylen', 'Principal'],
         ['Checked by', 'Ms. Anna Liza M. Bernales', 'Accounting Assistant'],
@@ -152,8 +164,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['person_in_charge'])) 
         ['Released by', 'Mrs. Lorna T. Villagracia', 'Cashier'],
     ];
 
+    // Signature Labels and Formatting
     foreach ($signatures as $signature) {
-        $pdf->MultiCell(50, 25, "{$signature[0]}:\n\n" . htmlspecialchars($signature[1]) . "\n{$signature[2]}", 1, 'C', false, 0, '', '', true);
+        $pdf->SetFont('helvetica', 'B', 12);
+        $pdf->Cell(50, 10, $signature[0], 0, 0, 'L', false);
+        $pdf->SetFont('helvetica', '', 12);
+        $pdf->Cell(100, 10, $signature[1], 0, 1, 'L', false);
+        $pdf->SetFont('helvetica', 'I', 10);
+        $pdf->Cell(50, 10, $signature[2], 0, 1, 'L', false);
+        $pdf->Ln(10);
     }
 
     // Output the PDF
@@ -319,6 +338,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['person_in_charge'])) 
     <!-- Dynamic Filters (Fields to Include in Report) -->
     <div>
         <label class="block text-sm font-medium text-gray-700">Fields to Include in Report:</label>
+        <label for=""class="block text-sm font-small text-gray-700">Leave blank for all</label>
         <div class="flex flex-wrap gap-4 mt-2">
             <?php
             // Assuming $available_fields is an array fetched from a database or defined dynamically
