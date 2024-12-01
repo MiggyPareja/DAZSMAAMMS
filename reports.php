@@ -275,18 +275,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['person_in_charge'])) 
       
 <script>
         document.getElementById('recordsBtn').addEventListener('click', function () {
-            const recordsMenu = document.getElementById('recordsMenu');
-            const arrow = document.getElementById('arrow');
-            recordsMenu.classList.toggle('hidden');
-            arrow.classList.toggle('rotate-180');
-        });
+    const recordsMenu = document.getElementById('recordsMenu');
+    const recordsArrow = document.getElementById('recordsArrow'); // Unique ID
+    recordsMenu.classList.toggle('hidden');
+    recordsArrow.classList.toggle('rotate-180');
+});
 
-        document.getElementById('reportsBtn').addEventListener('click', function () {
-            const reportsMenu = document.getElementById('reportsMenu');
-            const arrow = document.getElementById('arrow');
-            reportsMenu.classList.toggle('hidden');
-            arrow.classList.toggle('rotate-180');
-        });
+document.getElementById('reportsBtn').addEventListener('click', function () {
+    const reportsMenu = document.getElementById('reportsMenu');
+    const reportsArrow = document.getElementById('reportsArrow'); // Unique ID
+    reportsMenu.classList.toggle('hidden');
+    reportsArrow.classList.toggle('rotate-180');
+});
+
 </script>
       
 
@@ -301,9 +302,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['person_in_charge'])) 
                 unset($_SESSION['error']); ?>
             </div>
         <?php endif; ?>
-
-<form action="reports.php" method="POST" class="space-y-4">
-    <!-- Existing Fields -->
+        <form action="reports.php" method="POST" class="space-y-4">
+    <!-- Person In Charge Dropdown (Always Visible) -->
     <div>
         <label for="person_in_charge" class="block text-sm font-medium text-gray-700">Select Person In Charge:</label>
         <select id="person_in_charge" name="person_in_charge" required class="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
@@ -316,37 +316,173 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['person_in_charge'])) 
         </select>
     </div>
 
-    <!-- Dynamic Filters (Fields to Include in Report) -->
-    <div>
-        <label class="block text-sm font-medium text-gray-700">Fields to Include in Report:</label>
-        <div class="flex flex-wrap gap-4 mt-2">
-            <?php
-            // Assuming $available_fields is an array fetched from a database or defined dynamically
-            $available_fields = [
-                'Category' => 'Category',
-                'Sub-Category' => 'Sub-Category',
-                'Brand' => 'Brand',
-                'Asset' => 'Asset',
-                'Room Type' => 'Room Type',
-                'Room Comments' => 'Room Comments',
-                // Add more fields dynamically here (can come from a DB query)
-            ];
+    <!-- Select Fields to Include with Select All Checkbox -->
+    <div class="flex items-center space-x-2">
+        <label for="fields" class="block text-sm font-medium text-gray-700">Select Fields to Include:</label>
+        <input type="checkbox" id="select_all" class="mr-2">
+        <label for="select_all" class="text-sm text-gray-700">Select All</label>
+    </div>
 
-            foreach ($available_fields as $field => $label): ?>
-                <div>
-                    <input type="checkbox" id="<?php echo strtolower(str_replace(' ', '_', $field)); ?>" name="fields[]" value="<?php echo $field; ?>" class="mr-2">
-                    <label for="<?php echo strtolower(str_replace(' ', '_', $field)); ?>" class="text-gray-700"><?php echo $label; ?></label>
-                </div>
-            <?php endforeach; ?>
+    <!-- Field Selection (Checkboxes) -->
+    <div>
+        <div class="grid grid-cols-2 gap-4 mt-2">
+            <div>
+                <input type="checkbox" name="fields[]" value="Category" id="category" class="mr-2">
+                <label for="category" class="text-sm text-gray-700">Category</label>
+            </div>
+            <div>
+                <input type="checkbox" name="fields[]" value="Sub-Category" id="sub_category" class="mr-2">
+                <label for="sub_category" class="text-sm text-gray-700">Sub-Category</label>
+            </div>
+            <div>
+                <input type="checkbox" name="fields[]" value="Brand" id="brand" class="mr-2">
+                <label for="brand" class="text-sm text-gray-700">Brand</label>
+            </div>
+            <div>
+                <input type="checkbox" name="fields[]" value="Asset" id="asset" class="mr-2">
+                <label for="asset" class="text-sm text-gray-700">Asset</label>
+            </div>
+            <div>
+                <input type="checkbox" name="fields[]" value="Room Type" id="room_type" class="mr-2">
+                <label for="room_type" class="text-sm text-gray-700">Room Type</label>
+            </div>
+            <div>
+                <input type="checkbox" name="fields[]" value="Room Comments" id="comments" class="mr-2">
+                <label for="comments" class="text-sm text-gray-700">Room Comments</label>
+            </div>
         </div>
     </div>
 
-    <div class="flex justify-center items-center mt-6">
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-            Generate Report
-        </button>
+    <!-- Category Dropdown (Initially Hidden) -->
+    <div id="categoryDiv" style="display: none;">
+        <label for="category_id" class="block text-sm font-medium text-gray-700">Select Category:</label>
+        <select id="category_id" name="category_id" class="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Select Category</option>
+            <option value="1">Category 1</option>
+            <option value="2">Category 2</option>
+            <option value="3">Category 3</option>
+        </select>
+    </div>
+
+    <!-- Sub-Category Dropdown (Initially Hidden) -->
+    <div id="subCategoryDiv" style="display: none;">
+        <label for="sub_category_id" class="block text-sm font-medium text-gray-700">Select Sub-Category:</label>
+        <select id="sub_category_id" name="sub_category_id" class="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Select Sub-Category</option>
+            <option value="1">Sub-Category 1</option>
+            <option value="2">Sub-Category 2</option>
+        </select>
+    </div>
+
+    <!-- Brand Dropdown (Initially Hidden) -->
+    <div id="brandDiv" style="display: none;">
+        <label for="brand_id" class="block text-sm font-medium text-gray-700">Select Brand:</label>
+        <select id="brand_id" name="brand_id" class="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Select Brand</option>
+            <option value="1">Brand 1</option>
+            <option value="2">Brand 2</option>
+        </select>
+    </div>
+
+    <!-- Asset Dropdown (Initially Hidden) -->
+    <div id="assetDiv" style="display: none;">
+        <label for="asset_id" class="block text-sm font-medium text-gray-700">Select Asset:</label>
+        <select id="asset_id" name="asset_id" class="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Select Asset</option>
+            <option value="1">Asset 1</option>
+            <option value="2">Asset 2</option>
+        </select>
+    </div>
+
+    <!-- Room Type Dropdown (Initially Hidden) -->
+    <div id="roomTypeDiv" style="display: none;">
+        <label for="room_type_id" class="block text-sm font-medium text-gray-700">Select Room Type:</label>
+        <select id="room_type_id" name="room_type_id" class="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Select Room Type</option>
+            <option value="1">Room Type 1</option>
+            <option value="2">Room Type 2</option>
+        </select>
+    </div>
+
+    <!-- Room Comments Dropdown (Initially Hidden) -->
+    <div id="commentsDiv" style="display: none;">
+        <label for="room_comments" class="block text-sm font-medium text-gray-700">Enter Room Comments:</label>
+        <textarea id="room_comments" name="room_comments" class="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+    </div>
+
+    <!-- Other form fields go here -->
+
+    <div class="mt-4 flex justify-center">
+        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md">Generate Report</button>
     </div>
 </form>
+
+<script>
+    // Select All Checkbox functionality
+    const selectAllCheckbox = document.getElementById('select_all');
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]:not(#select_all)');
+
+    selectAllCheckbox.addEventListener('change', function() {
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAllCheckbox.checked;
+            toggleFieldVisibility(checkbox); // Ensure fields are toggled correctly
+        });
+    });
+
+    // Individual checkbox change logic
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            toggleFieldVisibility(this);
+        });
+    });
+
+    // Function to toggle visibility of fields
+    function toggleFieldVisibility(checkbox) {
+        const id = checkbox.id;
+        if (id === 'category' && checkbox.checked) {
+            document.getElementById('categoryDiv').style.display = 'block';
+        } else if (id === 'category') {
+            document.getElementById('categoryDiv').style.display = 'none';
+        }
+
+        if (id === 'sub_category' && checkbox.checked) {
+            document.getElementById('subCategoryDiv').style.display = 'block';
+        } else if (id === 'sub_category') {
+            document.getElementById('subCategoryDiv').style.display = 'none';
+        }
+
+        if (id === 'brand' && checkbox.checked) {
+            document.getElementById('brandDiv').style.display = 'block';
+        } else if (id === 'brand') {
+            document.getElementById('brandDiv').style.display = 'none';
+        }
+
+        if (id === 'asset' && checkbox.checked) {
+            document.getElementById('assetDiv').style.display = 'block';
+        } else if (id === 'asset') {
+            document.getElementById('assetDiv').style.display = 'none';
+        }
+
+        if (id === 'room_type' && checkbox.checked) {
+            document.getElementById('roomTypeDiv').style.display = 'block';
+        } else if (id === 'room_type') {
+            document.getElementById('roomTypeDiv').style.display = 'none';
+        }
+
+        if (id === 'comments' && checkbox.checked) {
+            document.getElementById('commentsDiv').style.display = 'block';
+        } else if (id === 'comments') {
+            document.getElementById('commentsDiv').style.display = 'none';
+        }
+    }
+</script>
+
+
+
+
+
+
+
 
 
     </div>

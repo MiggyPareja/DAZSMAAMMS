@@ -306,9 +306,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label class="block text-gray-700 text-sm font-bold mb-2">Maintenance Type:</label>
                     <select  type="text" name="maintenance" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" >
             <option disabled selected>Select maintenance type...</option>
-            <option >Disposal</option>
-            <option >Repair</option>
             <option >Available</option>
+            <option >Minor Repair</option>
+            <option >Major Available</option>
+            <option >Disposal</option>
                     </select>
                 </div>
                 

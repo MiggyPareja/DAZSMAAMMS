@@ -228,7 +228,7 @@ $disposed_assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <th class="text-left text-sm p-4 border-b">Room Type</th>
                     <th class="text-left text-sm p-4 border-b">Room</th>
                     <th class="text-left text-sm p-4 border-b">Person In Charge</th>
-                
+                    <th class="text-left text-sm p-4 border-b">Remarks</th>
                     <th class="text-left text-sm p-4 border-b">QR Code</th>
                     <th class="text-left text-sm p-4 border-b">Disposal Date</th>
                     <th class="text-left text-sm p-4 border-b">Actions</th>
@@ -244,6 +244,7 @@ $disposed_assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td class="p-4 text-sm border-b"><?php echo htmlspecialchars($asset['room_type']); ?></td>
                         <td class="p-4 text-sm border-b"><?php echo htmlspecialchars($asset['room']); ?></td>
                         <td class="p-4 text-sm border-b"><?php echo htmlspecialchars($asset['person_in_charge']); ?></td>
+                        <td class="p-4 text-sm border-b"><?php echo htmlspecialchars($asset['comments']); ?></td>
                         <td class="p-4 text-sm border-b">
                             <?php if ($asset['qrcode']): ?>
                                 <img src="<?php echo htmlspecialchars($asset['qrcode']); ?>" alt="QR Code" class="qrCodeImage w-12 h-12">
