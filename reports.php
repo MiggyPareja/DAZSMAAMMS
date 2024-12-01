@@ -1,7 +1,7 @@
 <?php
 session_start();
 require 'includes/db.php';
-require_once 'includes/TCPDF-main/tcpdf.php'; // Assuming you have the TCPDF library installed
+require_once 'includes/TCPDF-main/tcpdf.php'; 
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -292,18 +292,19 @@ document.getElementById('reportsBtn').addEventListener('click', function () {
       
 
     
-        <div class="flex-1 flex flex-col items-center justify-center ml-64">
-        <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md mt-40">
-        <h2 class="text-2xl font-bold mb-6 text-center">Person-In-Charge Reports</h2>
+<div class="flex-1 flex flex-col items-center justify-center ml-64">
+<div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md mt-40">
+<h2 class="text-2xl font-bold mb-6 text-center">Person-In-Charge Reports</h2>
 
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="mb-4 p-4 text-red-700 bg-red-100 rounded-lg">
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="mb-4 p-4 text-red-700 bg-red-100 rounded-lg">
                 <?php echo htmlspecialchars($_SESSION['error']);
                 unset($_SESSION['error']); ?>
             </div>
         <?php endif; ?>
-        <form action="reports.php" method="POST" class="space-y-4">
-    <!-- Person In Charge Dropdown (Always Visible) -->
+
+<form action="reports.php" method="POST" class="space-y-4">
+    <!-- Existing Fields -->
     <div>
         <label for="person_in_charge" class="block text-sm font-medium text-gray-700">Select Person In Charge:</label>
         <select id="person_in_charge" name="person_in_charge" required class="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
@@ -416,73 +417,6 @@ document.getElementById('reportsBtn').addEventListener('click', function () {
         <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md">Generate Report</button>
     </div>
 </form>
-
-<script>
-    // Select All Checkbox functionality
-    const selectAllCheckbox = document.getElementById('select_all');
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]:not(#select_all)');
-
-    selectAllCheckbox.addEventListener('change', function() {
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = selectAllCheckbox.checked;
-            toggleFieldVisibility(checkbox); // Ensure fields are toggled correctly
-        });
-    });
-
-    // Individual checkbox change logic
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            toggleFieldVisibility(this);
-        });
-    });
-
-    // Function to toggle visibility of fields
-    function toggleFieldVisibility(checkbox) {
-        const id = checkbox.id;
-        if (id === 'category' && checkbox.checked) {
-            document.getElementById('categoryDiv').style.display = 'block';
-        } else if (id === 'category') {
-            document.getElementById('categoryDiv').style.display = 'none';
-        }
-
-        if (id === 'sub_category' && checkbox.checked) {
-            document.getElementById('subCategoryDiv').style.display = 'block';
-        } else if (id === 'sub_category') {
-            document.getElementById('subCategoryDiv').style.display = 'none';
-        }
-
-        if (id === 'brand' && checkbox.checked) {
-            document.getElementById('brandDiv').style.display = 'block';
-        } else if (id === 'brand') {
-            document.getElementById('brandDiv').style.display = 'none';
-        }
-
-        if (id === 'asset' && checkbox.checked) {
-            document.getElementById('assetDiv').style.display = 'block';
-        } else if (id === 'asset') {
-            document.getElementById('assetDiv').style.display = 'none';
-        }
-
-        if (id === 'room_type' && checkbox.checked) {
-            document.getElementById('roomTypeDiv').style.display = 'block';
-        } else if (id === 'room_type') {
-            document.getElementById('roomTypeDiv').style.display = 'none';
-        }
-
-        if (id === 'comments' && checkbox.checked) {
-            document.getElementById('commentsDiv').style.display = 'block';
-        } else if (id === 'comments') {
-            document.getElementById('commentsDiv').style.display = 'none';
-        }
-    }
-</script>
-
-
-
-
-
-
-
 
 
     </div>
