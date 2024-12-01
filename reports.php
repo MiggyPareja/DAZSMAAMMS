@@ -1,7 +1,7 @@
 <?php
 session_start();
 require 'includes/db.php';
-require_once 'includes/TCPDF-main/tcpdf.php'; // Assuming you have the TCPDF library installed
+require_once 'includes/TCPDF-main/tcpdf.php'; 
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -291,16 +291,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['person_in_charge'])) 
       
 
     
-        <div class="flex-1 flex flex-col items-center justify-center ml-64">
-        <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md mt-40">
-        <h2 class="text-2xl font-bold mb-6 text-center">Person-In-Charge Reports</h2>
+<div class="flex-1 flex flex-col items-center justify-center ml-64">
+<div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md mt-40">
+<h2 class="text-2xl font-bold mb-6 text-center">Person-In-Charge Reports</h2>
 
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="mb-4 p-4 text-red-700 bg-red-100 rounded-lg">
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="mb-4 p-4 text-red-700 bg-red-100 rounded-lg">
                 <?php echo htmlspecialchars($_SESSION['error']);
                 unset($_SESSION['error']); ?>
-            </div>
-        <?php endif; ?>
+         </div>
+    <?php endif; ?>
 
 <form action="reports.php" method="POST" class="space-y-4">
     <!-- Existing Fields -->
@@ -347,6 +347,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['person_in_charge'])) 
         </button>
     </div>
 </form>
+</div>
+</div>
+</div>
+
+    
+<div class="flex-1 flex flex-col items-center justify-center ml-64">
+<div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md mt-2">
+<h2 class="text-2xl font-bold mb-6 text-center">Overall Reports</h2>
+
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="mb-4 p-4 text-red-700 bg-red-100 rounded-lg">
+                <?php echo htmlspecialchars($_SESSION['error']);
+                unset($_SESSION['error']); ?>
+         </div>
+    <?php endif; ?>
+
+<form action="overall_report.php" method="POST" class="space-y-4">
+  
+    
+    <div class="flex justify-center items-center mt-6">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+            Generate Report
+        </button>
+    </div>
+</form>
+
+
 
 
     </div>
