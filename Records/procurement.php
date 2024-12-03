@@ -8,7 +8,7 @@ require 'includes/db.php'; // Include DB connection
 function fetchPersonsInCharge()
 {
     global $conn;
-    $stmt = $conn->prepare("SELECT id, name FROM persons_in_charge");
+    $stmt = $conn->prepare("SELECT * FROM users");
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -18,7 +18,7 @@ $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 
 // Fetch username from the database
-$stmt = $conn->prepare("SELECT username FROM users WHERE id = ?");
+$stmt = $conn->prepare("SELECT username FROM users WHERE user_id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     try {
         // Insert form data into the database using PDO
-        $sql = "INSERT INTO procurement_requests (department, date, person_in_charge_id, particular_asset, quantity, unit_cost, status, model, specs, amount) 
+        $sql = "INSERT INTO procurement_requests (department, request_date, person_in_charge_id, particular_asset, quantity, unit_cost, status, model, specs, amount) 
                 VALUES (:department, :date, :personInChargeId, :particularAsset, :quantity, :price, 'Pending', :model, :specs, :amount)";
         $stmt = $conn->prepare($sql);
 
@@ -301,8 +301,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <select id="requestedBy" name="requestedBy" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     <option value="">Select Person In Charge</option>
                     <?php foreach ($persons_in_charge as $person): ?>
-                        <option value="<?php echo htmlspecialchars($person['id']); ?>">
-                            <?php echo htmlspecialchars($person['name']); ?>
+                        <option value="<?php echo htmlspecialchars($person['user_id']); ?>">
+                        <?php echo htmlspecialchars($person['last_name'] .',' . $person['first_name']); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
