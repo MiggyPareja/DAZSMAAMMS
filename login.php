@@ -21,13 +21,13 @@ if ($_SESSION['login_attempts'] >= $max_attempts && $time_since_last_attempt < $
     unset($_SESSION['error']);
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username']) && isset($_POST['password'])) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email']) && isset($_POST['password'])) {
     if ($_SESSION['login_attempts'] < $max_attempts) {
-        $username = $_POST['username'];
+        $username = $_POST['email'];
         $password = $_POST['password'];
 
-        $stmt = $conn->prepare("SELECT * FROM users WHERE username = :username");
-        $stmt->bindParam(':username', $username);
+        $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt->bindParam(':email', $username);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -126,7 +126,7 @@ background-position: center;
             <form action="login.php" method="POST">
                 <div class="space-y-4">
                 <?php if ($_SESSION['login_attempts'] < $max_attempts || $time_since_last_attempt >= $lockout_time): ?>       
-                    <input type="text" name="username" placeholder="Email" class="w-full p-2 rounded-xl bg-gray-200">
+                    <input type="text" name="email" placeholder="Email" class="w-full p-2 rounded-xl bg-gray-200">
                     <input type="password" name="password" placeholder="Password" class="w-full p-2 rounded-xl bg-gray-200">
                 </div>
 

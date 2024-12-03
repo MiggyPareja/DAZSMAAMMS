@@ -11,11 +11,11 @@ $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 
 // Fetch username from the database
-$stmt = $conn->prepare("SELECT username FROM users WHERE id = ?");
+$stmt = $conn->prepare("SELECT email FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
+$username = $user ? htmlspecialchars($user['email']) : 'Unknown User';
 ?>
 
 
@@ -239,7 +239,7 @@ $(document).ready(function() {
   <div class="grid grid-cols-2 gap-8">
       <?php
       $sql = "SELECT u.username, u.role, l.activity, l.userID, l.id 
-FROM userlogs l
+FROM users
 JOIN users u ON u.id = l.userID";
       $stmt = $conn->prepare($sql);
       $stmt->execute();

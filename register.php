@@ -3,12 +3,12 @@ include 'includes/db.php'; // Include your database connection settings
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Collect form data
-    $fname = $_POST['fname'];
-    $sname = $_POST['sname'];
-    $contact_num = $_POST['contact_num'];
+    $fname = $_POST['first_name'];
+    $sname = $_POST['last_name'];
+    $contact_num = $_POST['contact_number'];
     $email = $_POST['email'];
     $birthdate = $_POST['birthdate'];
-    $id_num = $_POST['id_num'];
+    $id_num = $_POST['id_number'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
     
@@ -37,15 +37,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user_id = $conn->lastInsertId();
 
   
-        $sql = "INSERT INTO user_information (fname, sname, contact_num, email, birthdate, id_num, id) 
+        $sql = "INSERT INTO users(first_name, last_name, contact_number, email, birthdate, id_number, user_id) 
                 VALUES (:fname, :sname, :contact_num, :email, :birthdate, :id_num, :user_id)";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':fname', $fname);
-        $stmt->bindParam(':sname', $sname);
-        $stmt->bindParam(':contact_num', $contact_num);
+        $stmt->bindParam(':first_name', $fname);
+        $stmt->bindParam(':last_name', $sname);
+        $stmt->bindParam(':contact_number', $contact_num);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':birthdate', $birthdate);
-        $stmt->bindParam(':id_num', $id_num);
+        $stmt->bindParam(':id_number', $id_num);
         $stmt->bindParam(':user_id', $user_id);
         $stmt->execute();
 

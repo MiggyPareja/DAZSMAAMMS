@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$dbname = 'school_asset';
+$dbname = 'dazmas';
 $username = 'root';
 $password = '';
 
