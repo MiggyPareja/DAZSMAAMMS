@@ -11,7 +11,7 @@ $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 
 // Fetch username from the database
-$stmt = $conn->prepare("SELECT email FROM users WHERE id = ?");
+$stmt = $conn->prepare("SELECT email FROM users WHERE user_id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -165,7 +165,7 @@ $username = $user ? htmlspecialchars($user['email']) : 'Unknown User';
           $stmt = $conn->query($totalRequestsQuery);
           $totalRequests = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-          $assignedAssetsQuery = "SELECT COUNT(*) as total FROM asset_records ";
+          $assignedAssetsQuery = "SELECT COUNT(*) as total FROM assets ";
           $stmt = $conn->query($assignedAssetsQuery);
           $assignedAssets = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
