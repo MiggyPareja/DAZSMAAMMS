@@ -2,7 +2,7 @@
 // view_request.php
 
 session_start();
-require 'includes/db.php'; // Include DB connection
+require '../includes/db.php'; // Include DB connection
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -13,7 +13,7 @@ $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 
 // Fetch username from the database
-$stmt = $conn->prepare("SELECT username FROM users WHERE id = ?");
+$stmt = $conn->prepare("SELECT username FROM users WHERE user_id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -107,11 +107,11 @@ try {
         }
     </script>
 <body class="bg-cover bg-center h-screen"
-    style="background-image: linear-gradient(110deg, rgba(32, 32, 146, 0.55) 100%, #202092 45%), url('images/Background.png');">
+    style="background-image: linear-gradient(110deg, rgba(32, 32, 146, 0.55) 100%, #202092 45%), url('../images/Background.png');">
         <a>
         <div class="bg-blue-900 w-64 flex flex-col p-4 fixed h-full space-y-4 z-20">
               <div class="image">
-                  <img src="images/SYSTEM LOGO 2.png" alt="User Image" class="text-white text-left">
+                  <img src="../images/SYSTEM LOGO 2.png" alt="User Image" class="text-white text-left">
               </div>
         </a>
 
@@ -119,7 +119,7 @@ try {
 
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
               <div class="image">
-                  <img src="images/avatar.png" class="rounded-full w-12 h-12" alt="User Image">
+                  <img src="../images/avatar.png" class="rounded-full w-12 h-12" alt="User Image">
               </div>
               <div class="info">
                   <a href="#" class="d-block text-white"><?php echo $username; ?></a>
@@ -128,7 +128,7 @@ try {
             <nav class="flex flex-col space-y-4">
                 <?php if ($role == 'Admin' || $role == 'Property Custodian' || $role == 'Inspector'): ?>
                     <!-- Dashboard -->
-                    <a href="dashboard.php">
+                    <a href="../dashboard.php">
                         <button class="nav-icon fas fa-tachometer-alt text-white text-sm"> Dashboard</button>             
                     </a>
 
@@ -173,7 +173,7 @@ try {
 
                     <!-- User Management for Admin Only -->
                     <?php if ($role == 'Admin'): ?>
-                        <a href="manage_users.php">
+                        <a href="../manage_users.php">
                             <button class="nav-icon fas fa-id-card text-white text-sm"> User Management</button>
                         </a>
                     <?php endif; ?>

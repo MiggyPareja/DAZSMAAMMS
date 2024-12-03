@@ -76,21 +76,21 @@ $username = $user ? htmlspecialchars($user['email']) : 'Unknown User';
     <span id="arrow" class="transform transition-transform">&#9660;</span>
 </button></a>
                     <div id="recordsMenu" class="hidden flex flex-col p-2 space-y-3">
-                        <a href="view_assets.php">
+                        <a href="Records/view_assets.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> View Assets</button>
                         </a>
                         <?php if ($role == 'Admin' || $role == 'Property Custodian'): ?>
-                        <a href="dispose_assets.php">
+                        <a href="Records/dispose_assets.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> View Disposed Assets</button>
                         </a>
-                        <a href="add_assets.php">
+                        <a href="Records/add_assets.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Deploy Assets</button>
                         </a>
                         <?php endif; ?>
-                        <a href="view_request.php">
+                        <a href="Records/view_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> View Requests</button>
                         </a>
-                        <a href="procurement.php">
+                        <a href="Records/procurement.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Generate Request</button>
                         </a>
                     </div>
@@ -100,11 +100,11 @@ $username = $user ? htmlspecialchars($user['email']) : 'Unknown User';
                     <button id="reportsBtn" class="nav-icon fas fa-chart-bar text-white text-sm"> Reports
     <span id="arrow" class="transform transition-transform">&#9660;</span>
 </button></a>
-                    <div id="reportsMenu" class="hidden flex flex-col p-2 space-y-3">
+                    <div id="Reports/reportsMenu" class="hidden flex flex-col p-2 space-y-3">
                         <a href="reports.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Person-In-Charge</button>
                         </a>
-                        <a href="asset_durability.php">
+                        <a href="Reports/asset_durability.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Asset Durability</button>
                         </a>
                     </div>
@@ -126,7 +126,7 @@ $username = $user ? htmlspecialchars($user['email']) : 'Unknown User';
                     <a href="reports.php">
                         <button class="nav-icon fas fa-folder text-white text-sm"> Reports</button>
                     </a>
-                    <a href="procurement.php">
+                    <a href="Records/procurement.php">
                         <button class="far fa-circle nav-icon text-white text-sm"> Generate Request</button>
                     </a>
                     <a href="logout.php" onclick="confirmLogout(event)">

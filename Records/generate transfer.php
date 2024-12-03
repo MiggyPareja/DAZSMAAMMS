@@ -5,7 +5,7 @@ require 'includes/db.php'; // Include DB connection
 require 'includes/TCPDF-main/tcpdf.php'; // Include TCPDF library
 
 if (!isset($_POST['transfer'])) {
-    header('Location: view_request.php');
+    header('Location: Records/view_request.php');
     exit;
 }
 

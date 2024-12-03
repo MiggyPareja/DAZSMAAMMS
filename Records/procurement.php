@@ -2,7 +2,7 @@
 // procurement.php
 
 session_start();
-require 'includes/db.php'; // Include DB connection
+require '../includes/db.php'; // Include DB connection
 
 // Fetch options for "Requested by" dropdown
 function fetchPersonsInCharge()
@@ -96,11 +96,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 
 <body class="bg-cover bg-center h-screen"
-    style="background-image: linear-gradient(110deg, rgba(32, 32, 146, 0.55) 100%, #202092 45%), url('images/Background.png');">
+    style="background-image: linear-gradient(110deg, rgba(32, 32, 146, 0.55) 100%, #202092 45%), url('../images/Background.png');">
         <a>
         <div class="bg-blue-900 w-64 flex flex-col p-4 fixed h-full space-y-4 z-20">
               <div class="image">
-                  <img src="images/SYSTEM LOGO 2.png" alt="User Image" class="text-white text-left">
+                  <img src="../images/SYSTEM LOGO 2.png" alt="User Image" class="text-white text-left">
               </div>
         </a>
 
@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
               <div class="image">
-                  <img src="images/avatar.png" class="rounded-full w-12 h-12" alt="User Image">
+                  <img src="../images/avatar.png" class="rounded-full w-12 h-12" alt="User Image">
               </div>
               <div class="info">
                   <a href="#" class="d-block text-white"><?php echo $username; ?></a>
@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <nav class="flex flex-col space-y-4">
                 <?php if ($role == 'Admin' || $role == 'Property Custodian' || $role == 'Inspector'): ?>
                     <!-- Dashboard -->
-                    <a href="dashboard.php">
+                    <a href="../dashboard.php">
                         <button class="nav-icon fas fa-tachometer-alt text-white text-sm"> Dashboard</button>             
                     </a>
 

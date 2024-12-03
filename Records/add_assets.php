@@ -1,7 +1,7 @@
 <?php
 session_start();
-require 'includes/db.php';
-require 'includes/phpqrcode/qrlib.php'; // Include the QR code library
+require '../includes/db.php';
+require '../includes/phpqrcode/qrlib.php'; // Include the QR code library
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -14,7 +14,7 @@ $error = '';
 $success_message = '';
 
 // Fetch username from the database
-$stmt = $conn->prepare("SELECT username FROM users WHERE id = ?");
+$stmt = $conn->prepare("SELECT username FROM users WHERE user_id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -24,7 +24,7 @@ $username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
 function fetchOptions($table, $column)
 {
     global $conn;
-    $stmt = $conn->prepare("SELECT id, $column FROM $table");
+    $stmt = $conn->prepare("SELECT user_id, $column FROM $table");
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
