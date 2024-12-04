@@ -93,7 +93,7 @@ if (isset($_GET['delete_id'])) {
             <nav class="flex flex-col space-y-4">
                 <?php if ($role == 'Admin' || $role == 'Property Custodian' || $role == 'Inspector'): ?>
                     <!-- Dashboard -->
-                    <a href="dashboard.php">
+                    <a href="../dashboard.php">
                         <button class="nav-icon fas fa-tachometer-alt text-white text-sm"> Dashboard</button>             
                     </a>
 
@@ -103,21 +103,21 @@ if (isset($_GET['delete_id'])) {
     <span id="arrow" class="transform transition-transform">&#9660;</span>
 </button></a>
                     <div id="recordsMenu" class="hidden flex flex-col p-2 space-y-3">
-                        <a href="view_assets.php">
+                        <a href="../Records/view_assets.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> View Assets</button>
                         </a>
                         <?php if ($role == 'Admin' || $role == 'Property Custodian'): ?>
-                        <a href="dispose_assets.php">
+                        <a href="../Records/dispose_assets.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> View Disposed Assets</button>
                         </a>
-                        <a href="add_assets.php">
+                        <a href="../Records/add_assets.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Deploy Assets</button>
                         </a>
                         <?php endif; ?>
-                        <a href="view_request.php">
+                        <a href="../Records/view_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> View Requests</button>
                         </a>
-                        <a href="procurement.php">
+                        <a href="../Records/procurement.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Generate Request</button>
                         </a>
                     </div>
@@ -127,11 +127,11 @@ if (isset($_GET['delete_id'])) {
                     <button id="reportsBtn" class="nav-icon fas fa-chart-bar text-white text-sm"> Reports
     <span id="arrow" class="transform transition-transform">&#9660;</span>
 </button></a>
-                    <div id="reportsMenu" class="hidden flex flex-col p-2 space-y-3">
-                        <a href="reports.php">
+                    <div id="../Reports/reportsMenu" class="hidden flex flex-col p-2 space-y-3">
+                        <a href="../Reports/reports.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Person-In-Charge</button>
                         </a>
-                        <a href="asset_durability.php">
+                        <a href="../Reports/asset_durability.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Asset Durability</button>
                         </a>
                     </div>
@@ -144,19 +144,19 @@ if (isset($_GET['delete_id'])) {
                     <?php endif; ?>
 
                     <!-- Log Out -->
-                    <a href="logout.php" onclick="confirmLogout(event)">
+                    <a href="../logout.php" onclick="confirmLogout(event)">
                         <button class="nav-icon fas fa-sign-out-alt text-white text-sm"> Log Out</button>
                     </a>
 
                 <?php elseif ($role == 'Faculty'): ?>
                     <!-- Faculty Specific Options -->
-                    <a href="reports.php">
+                    <a href="../Reports/reports.php">
                         <button class="nav-icon fas fa-folder text-white text-sm"> Reports</button>
                     </a>
-                    <a href="procurement.php">
+                    <a href="../Reports/procurement.php">
                         <button class="far fa-circle nav-icon text-white text-sm"> Generate Request</button>
                     </a>
-                    <a href="logout.php" onclick="confirmLogout(event)">
+                    <a href="../logout.php" onclick="confirmLogout(event)">
                         <button class="nav-icon fas fa-sign-out-alt text-white text-sm"> Log Out</button>
                     </a>
                 <?php endif; ?>
