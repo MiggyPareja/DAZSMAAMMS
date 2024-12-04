@@ -1,7 +1,7 @@
 <?php
 session_start();
-require 'includes/db.php';
-require_once 'includes/TCPDF-main/tcpdf.php'; 
+require '../includes/db.php';
+require_once '../includes/TCPDF-main/tcpdf.php'; 
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 function fetchPersonsInCharge()
 {
     global $conn;
-    $stmt = $conn->prepare("SELECT id, name FROM persons_in_charge");
+    $stmt = $conn->prepare("SELECT user_id FROM users");
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

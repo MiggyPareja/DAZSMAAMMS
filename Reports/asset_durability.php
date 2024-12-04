@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'includes/db.php';
+require '../includes/db.php';
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -10,37 +10,46 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 
-// Fetch username from the database
-$stmt = $conn->prepare("SELECT username FROM users WHERE id = ?");
+// Fetch username from the `users` table
+$stmt = $conn->prepare("SELECT username FROM users WHERE user_id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
 
-// Fetch all categories
-$categoryQuery = $conn->query("SELECT DISTINCT c.name FROM asset_records ar JOIN categories c ON ar.category_id = c.id;");
+// Fetch all categories (distinct values from `assets`)
+$categoryQuery = $conn->query("SELECT DISTINCT c.name FROM assets ar JOIN categories c ON ar.category_id = c.id;");
 $categories = $categoryQuery->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch asset data for the chart (all categories by default)
-$chartQuery = $conn->query("SELECT 
-    c.name AS category_name, 
-    COALESCE(AVG(ABS(DATEDIFF(pr.date, ar.disposal_date))), 0) AS avg_durability
-FROM 
-    categories c
-LEFT JOIN asset_records ar ON ar.category_id = c.id
-LEFT JOIN procurement_requests pr ON ar.person_in_charge_id = pr.person_in_charge_id
-    AND pr.status = 'Approved'
-GROUP BY 
-    c.name;");
+// Fetch asset data for the chart
+$chartQuery = $conn->query("
+    SELECT 
+        c.name AS category_name, 
+        COALESCE(AVG(ABS(DATEDIFF(pr.date, ar.disposal_date))), 0) AS avg_durability
+    FROM 
+        categories c
+    LEFT JOIN assets ar ON ar.category_id = c.id
+    LEFT JOIN procurement_requests pr ON ar.person_in_charge_id = pr.person_in_charge_id
+        AND pr.status = 'Approved'
+    GROUP BY 
+        c.name;
+");
 $chartData = $chartQuery->fetchAll(PDO::FETCH_ASSOC);
 
-
-$assetQuery = $conn->query("SELECT ar.id, c.name AS category_name, a.name as asset_name FROM asset_records ar 
-                            JOIN categories c ON ar.category_id = c.id
-                            JOIN assets a on ar.asset_id = a.id
-                            GROUP BY ar.id;");
+// Fetch assets list
+$assetQuery = $conn->query("
+    SELECT 
+        ar.id AS asset_id, 
+        ar.name AS asset_name, 
+        c.name AS category_name 
+    FROM 
+        assets ar
+    JOIN categories c ON ar.category_id = c.id
+    ORDER BY ar.id;
+");
 $assetList = $assetQuery->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

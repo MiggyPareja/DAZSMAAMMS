@@ -24,14 +24,13 @@ $username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
 function fetchOptions($table, $column)
 {
     global $conn;
-    $stmt = $conn->prepare("SELECT user_id, $column FROM $table");
+    $stmt = $conn->prepare("SELECT * FROM users");
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
 $categories = fetchOptions('categories', 'name');
-$room_types = fetchOptions('room_types', 'name');
-$persons_in_charge = fetchOptions('persons_in_charge', 'name');
+$room_types = fetchOptions('rooms', 'name');
+$persons_in_charge = fetchOptions('users', 'first_name, ');
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -266,7 +265,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <nav class="flex flex-col space-y-4">
                 <?php if ($role == 'Admin' || $role == 'Property Custodian' || $role == 'Inspector'): ?>
                     <!-- Dashboard -->
-                    <a href="dashboard.php">
+                    <a href="../dashboard.php">
                         <button class="nav-icon fas fa-tachometer-alt text-white text-sm"> Dashboard</button>             
                     </a>
 
@@ -311,13 +310,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     <!-- User Management for Admin Only -->
                     <?php if ($role == 'Admin'): ?>
-                        <a href="manage_users.php">
+                        <a href="../Users/manage_users.php">
                             <button class="nav-icon fas fa-id-card text-white text-sm"> User Management</button>
                         </a>
                     <?php endif; ?>
 
                     <!-- Log Out -->
-                    <a href="logout.php" onclick="confirmLogout(event)">
+                    <a href="../logout.php" onclick="confirmLogout(event)">
                         <button class="nav-icon fas fa-sign-out-alt text-white text-sm"> Log Out</button>
                     </a>
 
@@ -377,7 +376,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <select id="category" name="category" required class="w-full p-1 border rounded-md">
                 <option value="">Select Category</option>
                 <?php foreach ($categories as $category): ?>
-                    <option value="<?php echo htmlspecialchars($category['id']); ?>"><?php echo htmlspecialchars($category['name']); ?></option>
+                    <option value="<?php echo htmlspecialchars($category['user_id']); ?>"><?php echo htmlspecialchars($category['name']); ?></option>
                 <?php endforeach; ?>
             </select>
         </div>

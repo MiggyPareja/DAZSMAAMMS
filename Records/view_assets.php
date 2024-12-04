@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'includes/db.php';
+require '../includes/db.php';
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
@@ -14,7 +14,7 @@ $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 
 // Fetch username from the database
-$stmt = $conn->prepare("SELECT username FROM users WHERE id = ?");
+$stmt = $conn->prepare("SELECT username FROM users WHERE user_id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -24,10 +24,11 @@ $username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
 function fetchOptions($table, $column)
 {
     global $conn;
-    $stmt = $conn->prepare("SELECT id, $column FROM $table");
+    $stmt = $conn->prepare("SELECT * FROM users");
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
 
 $categories = fetchOptions('categories', 'name');
 $sub_categories = fetchOptions('sub_categories', 'name');
@@ -65,25 +66,29 @@ if (!empty($_GET['person_in_charge'])) {
 }
 
 // Fetch assets
-$sql = "SELECT assets.id, 
-               categories.name AS category, 
-               sub_categories.name AS sub_category, 
-               assets.name AS asset,
-               room_types.name AS room_type, 
-               rooms.name AS room, 
-               persons_in_charge.name AS person_in_charge,
-               asset_records.qrcode AS qrcode,
-               asset_records.id AS asset_record_id,
-               asset_records.comments,
-               asset_records.last_inspected
-        FROM asset_records
-        JOIN assets ON asset_records.asset_id = assets.id
-        JOIN categories ON assets.category_id = categories.id
-        JOIN sub_categories ON assets.sub_category_id = sub_categories.id
-        LEFT JOIN rooms ON asset_records.room_id = rooms.id
-        LEFT JOIN room_types ON rooms.room_type_id = room_types.id
-        LEFT JOIN persons_in_charge ON asset_records.person_in_charge_id = persons_in_charge.id
-        WHERE asset_records.disposed != 'Requested' ORDER BY assets.id DESC"; // Add condition to filter out disposed items
+$sql = "SELECT  
+            assets.asset_id AS user_id,  
+            assets.name AS asset_name,  
+            categories.name AS category, 
+            rooms.name AS room_name, 
+            users.username AS user_name, 
+            assets.asset_count, 
+            assets.qrcode, 
+            assets.comments, 
+            assets.disposal_date, 
+            assets.is_disposed, 
+            assets.model, 
+            assets.specs, 
+            assets.status, 
+            assets.last_inspected, 
+            assets.last_updated_by, 
+            assets.updated_at
+        FROM assets
+        LEFT JOIN categories ON assets.category_id = categories.category_id
+        LEFT JOIN rooms ON assets.room_id = rooms.room_id
+        LEFT JOIN users ON assets.person_in_charge_id = users.user_id
+        WHERE assets.is_disposed = 'Requested';";
+
 
 if (!empty($where)) {
     $sql .= " AND " . implode(' AND ', $where);
@@ -191,7 +196,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
             <nav class="flex flex-col space-y-4">
                 <?php if ($role == 'Admin' || $role == 'Property Custodian' || $role == 'Inspector'): ?>
                     <!-- Dashboard -->
-                    <a href="dashboard.php">
+                    <a href="../dashboard.php">
                         <button class="nav-icon fas fa-tachometer-alt text-white text-sm"> Dashboard</button>             
                     </a>
 
@@ -236,13 +241,13 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
 
                     <!-- User Management for Admin Only -->
                     <?php if ($role == 'Admin'): ?>
-                        <a href="manage_users.php">
+                        <a href="../Users/manage_users.php">
                             <button class="nav-icon fas fa-id-card text-white text-sm"> User Management</button>
                         </a>
                     <?php endif; ?>
 
                     <!-- Log Out -->
-                    <a href="logout.php" onclick="confirmLogout(event)">
+                    <a href="../logout.php" onclick="confirmLogout(event)">
                         <button class="nav-icon fas fa-sign-out-alt text-white text-sm"> Log Out</button>
                     </a>
 

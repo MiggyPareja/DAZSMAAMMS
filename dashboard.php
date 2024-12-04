@@ -100,8 +100,8 @@ $username = $user ? htmlspecialchars($user['email']) : 'Unknown User';
                     <button id="reportsBtn" class="nav-icon fas fa-chart-bar text-white text-sm"> Reports
     <span id="arrow" class="transform transition-transform">&#9660;</span>
 </button></a>
-                    <div id="Reports/reportsMenu" class="hidden flex flex-col p-2 space-y-3">
-                        <a href="reports.php">
+                    <div id="reportsMenu" class="hidden flex flex-col p-2 space-y-3">
+                        <a href="Reports/reports.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Person-In-Charge</button>
                         </a>
                         <a href="Reports/asset_durability.php">

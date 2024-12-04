@@ -162,13 +162,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     <!-- User Management for Admin Only -->
                     <?php if ($role == 'Admin'): ?>
-                        <a href="manage_users.php">
+                        <a href="../Users/manage_users.php">
                             <button class="nav-icon fas fa-id-card text-white text-sm"> User Management</button>
                         </a>
                     <?php endif; ?>
 
                     <!-- Log Out -->
-                    <a href="logout.php" onclick="confirmLogout(event)">
+                    <a href="../logout.php" onclick="confirmLogout(event)">
                         <button class="nav-icon fas fa-sign-out-alt text-white text-sm"> Log Out</button>
                     </a>
 

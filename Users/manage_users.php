@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'includes/db.php';
+require '../includes/db.php';
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -11,7 +11,7 @@ $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 
 // Fetch username from the database
-$stmt = $conn->prepare("SELECT username FROM users WHERE id = ?");
+$stmt = $conn->prepare("SELECT username FROM users WHERE user_id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -19,17 +19,14 @@ $username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
 
 // Fetch user records from the database
 $stmt = $conn->prepare("SELECT 
-    users.id, 
+    users.user_id, 
     users.username, 
     users.role, 
-    user_information.fname,
-    user_information.sname
+    users.first_name,
+    users.Last_name
 FROM 
     users
-JOIN 
-    user_information 
-ON 
-    users.id = user_information.id
+
 WHERE 
     users.status = 'Active';
 ");
