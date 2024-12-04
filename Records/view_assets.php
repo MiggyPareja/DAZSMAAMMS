@@ -231,10 +231,10 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     <span id="arrow" class="transform transition-transform">&#9660;</span>
 </button></a>
                     <div id="reportsMenu" class="hidden flex flex-col p-2 space-y-3">
-                        <a href="reports.php">
+                        <a href="../Reports/reports.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Person-In-Charge</button>
                         </a>
-                        <a href="asset_durability.php">
+                        <a href="../Reports/asset_durability.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Asset Durability</button>
                         </a>
                     </div>
@@ -253,13 +253,13 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
 
                 <?php elseif ($role == 'Faculty'): ?>
                     <!-- Faculty Specific Options -->
-                    <a href="reports.php">
+                    <a href="../Reports/reports.php">
                         <button class="nav-icon fas fa-folder text-white text-sm"> Reports</button>
                     </a>
-                    <a href="procurement.php">
+                    <a href="../Reports/procurement.php">
                         <button class="far fa-circle nav-icon text-white text-sm"> Generate Request</button>
                     </a>
-                    <a href="logout.php" onclick="confirmLogout(event)">
+                    <a href="../logout.php" onclick="confirmLogout(event)">
                         <button class="nav-icon fas fa-sign-out-alt text-white text-sm"> Log Out</button>
                     </a>
                 <?php endif; ?>

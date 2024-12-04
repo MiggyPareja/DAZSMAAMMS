@@ -152,10 +152,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <span id="arrow" class="transform transition-transform">&#9660;</span>
 </button></a>
                     <div id="reportsMenu" class="hidden flex flex-col p-2 space-y-3">
-                        <a href="reports.php">
+                        <a href="../Reports/reports.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Person-In-Charge</button>
                         </a>
-                        <a href="asset_durability.php">
+                        <a href="../Reports/asset_durability.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Asset Durability</button>
                         </a>
                     </div>
