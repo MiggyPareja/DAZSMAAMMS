@@ -110,7 +110,7 @@ $username = $user ? htmlspecialchars($user['email']) : 'Unknown User';
 
                     <!-- User Management for Admin Only -->
                     <?php if ($role == 'Admin'): ?>
-                        <a href="manage_users.php">
+                        <a href="Users/manage_users.php">
                             <button class="nav-icon fas fa-id-card text-white text-sm"> User Management</button>
                         </a>
                     <?php endif; ?>
