@@ -18,11 +18,11 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 $username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
 
 // Fetch all categories (distinct values from `assets`)
-$categoryQuery = $conn->query("SELECT DISTINCT c.name FROM assets ar JOIN categories c ON ar.category_id = c.id;");
-$categories = $categoryQuery->fetchAll(PDO::FETCH_ASSOC);
+//$categoryQuery = $conn->query("SELECT DISTINCT c.name FROM assets ar JOIN categories c ON ar.category_id = c.id;");
+//$categories = $categoryQuery->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch asset data for the chart
-$chartQuery = $conn->query("
+/*$chartQuery = $conn->query("
     SELECT 
         c.name AS category_name, 
         COALESCE(AVG(ABS(DATEDIFF(pr.date, ar.disposal_date))), 0) AS avg_durability
@@ -33,10 +33,11 @@ $chartQuery = $conn->query("
         AND pr.status = 'Approved'
     GROUP BY 
         c.name;
-");
-$chartData = $chartQuery->fetchAll(PDO::FETCH_ASSOC);
+");*/
+//$chartData = $chartQuery->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch assets list
+/*
 $assetQuery = $conn->query("
     SELECT 
         ar.id AS asset_id, 
@@ -48,6 +49,7 @@ $assetQuery = $conn->query("
     ORDER BY ar.id;
 ");
 $assetList = $assetQuery->fetchAll(PDO::FETCH_ASSOC);
+*/
 ?>
 
 <!DOCTYPE html>
@@ -68,38 +70,95 @@ $assetList = $assetQuery->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body class="bg-cover bg-center h-screen"
     style="background-image: linear-gradient(110deg, rgba(32, 32, 146, 0.55) 100%, #202092 45%), url('images/Background.png');">
-    <a>
-    <div class="bg-blue-900 w-64 flex flex-col p-4 fixed h-full space-y-4 z-20">
-          <div class="image">
-              <img src="images/SYSTEM LOGO 2.png" alt="User Image" class="text-white text-left">
-          </div>
-    </a>
+        <a>
+        <div class="bg-blue-900 w-64 flex flex-col p-4 fixed h-full space-y-4 z-20">
+              <div class="image">
+                  <img src="images/SYSTEM LOGO 2.png" alt="User Image" class="text-white text-left">
+              </div>
+        </a>
 
-    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-          <div class="image">
-              <img src="images/avatar.png" class="rounded-full w-12 h-12" alt="User Image">
+
+
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+              <div class="image">
+                  <img src="images/avatar.png" class="rounded-full w-12 h-12" alt="User Image">
+              </div>
+              <div class="info">
+                  <a href="#" class="d-block text-white"><?php echo $username; ?></a>
+              </div>
           </div>
-          <div class="info">
-              <a href="#" class="d-block text-white"><?php echo $username; ?></a>
-          </div>
-      </div>
-        <nav class="flex flex-col space-y-4">
-            <?php if ($role == 'Admin' || $role == 'Property Custodian' || $role == 'Inspector'): ?>
-                <a href="dashboard.php">
-                    <button class="nav-icon fas fa-tachometer-alt text-white text-sm"> Dashboard</button>             
-                </a>
-                <a href="view_assets.php">
-                    <button class="nav-icon fas fa-folder text-white text-sm"> View Assets</button>
-                </a>
-                <a href="dispose_assets.php">
-                    <button class="nav-icon fas fa-folder text-white text-sm"> View Disposed Assets</button>
-                </a>
-                <a href="logout.php">
-                    <button class="nav-icon fas fa-sign-out-alt text-white text-sm"> Log Out</button>
-                </a>
-            <?php endif; ?>
-        </nav>
-    </div>
+            <nav class="flex flex-col space-y-4">
+                <?php if ($role == 'Admin' || $role == 'Property Custodian' || $role == 'Inspector'): ?>
+                    <!-- Dashboard -->
+                    <a href="../dashboard.php">
+                        <button class="nav-icon fas fa-tachometer-alt text-white text-sm"> Dashboard</button>             
+                    </a>
+
+                    <!-- Collapsible Records Section -->
+                    <a>
+                    <button id="recordsBtn" class="nav-icon fas fa-folder text-white text-sm"> Records
+    <span id="arrow" class="transform transition-transform">&#9660;</span>
+</button></a>
+                    <div id="recordsMenu" class="hidden flex flex-col p-2 space-y-3">
+                        <a href="../Records/view_assets.php">
+                            <button class="far fa-circle nav-icon text-white text-xs"> View Assets</button>
+                        </a>
+                        <?php if ($role == 'Admin' || $role == 'Property Custodian'): ?>
+                        <a href="../Records/dispose_assets.php">
+                            <button class="far fa-circle nav-icon text-white text-xs"> View Disposed Assets</button>
+                        </a>
+                        <a href="../Records/add_assets.php">
+                            <button class="far fa-circle nav-icon text-white text-xs"> Deploy Assets</button>
+                        </a>
+                        <?php endif; ?>
+                        <a href="../Records/view_request.php">
+                            <button class="far fa-circle nav-icon text-white text-xs"> View Requests</button>
+                        </a>
+                        <a href="../Records/procurement.php">
+                            <button class="far fa-circle nav-icon text-white text-xs"> Generate Request</button>
+                        </a>
+                    </div>
+                    
+                    <!-- Reports -->
+                    <a>
+                    <button id="reportsBtn" class="nav-icon fas fa-chart-bar text-white text-sm"> Reports
+                    <span id="arrow" class="transform transition-transform">&#9660;</span>
+                    </button></a>
+                    <div id="reportsMenu" class="hidden flex flex-col p-2 space-y-3">
+                        <a href="reports.php">
+                            <button class="far fa-circle nav-icon text-white text-xs"> Person-In-Charge</button>
+                        </a>
+                        <a href="asset_durability.php">
+                            <button class="far fa-circle nav-icon text-white text-xs"> Asset Durability</button>
+                        </a>
+                    </div>
+
+                    <!-- User Management for Admin Only -->
+                    <?php if ($role == 'Admin'): ?>
+                        <a href="../Users/manage_users.php">
+                            <button class="nav-icon fas fa-id-card text-white text-sm"> User Management</button>
+                        </a>
+                    <?php endif; ?>
+
+                    <!-- Log Out -->
+                    <a href="../logout.php" onclick="confirmLogout(event)">
+                        <button class="nav-icon fas fa-sign-out-alt text-white text-sm"> Log Out</button>
+                    </a>
+
+                <?php elseif ($role == 'Faculty'): ?>
+                    <!-- Faculty Specific Options -->
+                    <a href="reports.php">
+                        <button class="nav-icon fas fa-folder text-white text-sm"> Reports</button>
+                    </a>
+                    <a href="../Records/procurement.php">
+                        <button class="far fa-circle nav-icon text-white text-sm"> Generate Request</button>
+                    </a>
+                    <a href="../logout.php" onclick="confirmLogout(event)">
+                        <button class="nav-icon fas fa-sign-out-alt text-white text-sm"> Log Out</button>
+                    </a>
+                <?php endif; ?>
+            </nav>
+        </div>
 
 <script>
         document.getElementById('recordsBtn').addEventListener('click', function () {
