@@ -44,8 +44,7 @@ $username = $user ? htmlspecialchars($user['email']) : 'Unknown User';
 
 </head>
 
-<body class="bg-cover bg-center h-screen"
-    style="background-image: linear-gradient(110deg, rgba(32, 32, 146, 0.55) 100%, #202092 45%), url('images/Background.png');">
+<body class="bg-cover bg-center h-screen bg-primary">
         <a>
         <div class="bg-blue-900 w-64 flex flex-col p-4 fixed h-full space-y-4 z-20">
               <div class="image">
@@ -146,7 +145,7 @@ $username = $user ? htmlspecialchars($user['email']) : 'Unknown User';
   </div>
   </div>
   </div>
-            <?php elseif ($role == 'Faculty' || $role == 'Requestor' || $role == 'Admin' || $role == 'Property Custodian' || $role == 'Inspector'): ?> 
+            <?php elseif ($role == 'Requestor' || $role == 'Admin' || $role == 'Property Custodian' || $role == 'Inspector'): ?> 
                 <div class="flex-1 flex flex-col items-center justify-center ml-64">
   
         
