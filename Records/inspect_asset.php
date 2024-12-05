@@ -10,144 +10,6 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 
-// Fetch username from the database
-$stmt = $conn->prepare("SELECT username FROM users WHERE id = ?");
-$stmt->execute([$user_id]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-$username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
-// Fetch the asset record details
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    header('Location: view_assets.php');
-    exit();
-}
-
-$asset_record_id = intval($_GET['id']);
-
-$stmt = $conn->prepare("
-    SELECT asset_records.id, 
-           assets.name AS asset_name,
-           categories.name AS category_name,
-           sub_categories.name AS sub_category_name,
-           room_types.name AS room_type_name,
-           rooms.name AS room_name,
-           persons_in_charge.name AS person_in_charge_name,
-           asset_records.comments, 
-           asset_records.last_inspected,
-           asset_records.qrcode
-    FROM asset_records
-    JOIN assets ON asset_records.asset_id = assets.id
-    JOIN categories ON assets.category_id = categories.id
-    JOIN sub_categories ON assets.sub_category_id = sub_categories.id
-    JOIN room_types ON asset_records.room_type_id = room_types.id
-    JOIN rooms ON asset_records.room_id = rooms.id
-    JOIN persons_in_charge ON asset_records.person_in_charge_id = persons_in_charge.id
-    WHERE asset_records.id = ?
-");
-$stmt->execute([$asset_record_id]);
-$asset = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$asset) {
-    header('Location: view_assets.php');
-    exit();
-}
-
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $comment = trim($_POST['comment']);
-    $timestamp = date('Y-m-d H:i:s');
-    $maintenance = trim($_POST['maintenance']);
-
-    if (!empty($comment)) {
-        try {
-  
-    $query = $conn->prepare("INSERT INTO `comments` (`id`, `comments`, `date`, maintenance, userID) 
-    VALUES (?, ?, ?, ?, ?)");
-    $query->execute([$asset_record_id, $comment,$timestamp,$maintenance, $user_id]);
-
-
-            $stmt = $conn->prepare("
-                SELECT asset_records.*, 
-                       assets.name AS asset_name,
-                       categories.name AS category_name,
-                       sub_categories.name AS sub_category_name,
-                       room_types.name AS room_type_name,
-                       rooms.name AS room_name,
-                       persons_in_charge.name AS person_in_charge_name
-                FROM asset_records
-                JOIN assets ON asset_records.asset_id = assets.id
-                JOIN categories ON assets.category_id = categories.id
-                JOIN sub_categories ON assets.sub_category_id = sub_categories.id
-                JOIN room_types ON asset_records.room_type_id = room_types.id
-                JOIN rooms ON asset_records.room_id = rooms.id
-                JOIN persons_in_charge ON asset_records.person_in_charge_id = persons_in_charge.id
-                WHERE asset_records.id = ?
-            ");
-            $stmt->execute([$asset_record_id]);
-            $updated_asset = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            $stmt = $conn->prepare("
-                SELECT transfer_history.room_id, 
-                       transfer_history.person_in_charge_id, 
-                       transfer_history.transferred_date, 
-                       transfer_history.transferred_by, 
-                       transfer_history.comments,
-                       rooms.name AS room_name,
-                       persons_in_charge.name AS person_in_charge_name,
-                       users.username AS transferred_by_name
-                FROM transfer_history
-                LEFT JOIN rooms ON transfer_history.room_id = rooms.id
-                LEFT JOIN persons_in_charge ON transfer_history.person_in_charge_id = persons_in_charge.id
-                LEFT JOIN users ON transfer_history.transferred_by = users.id
-                WHERE transfer_history.asset_records_id = ?
-                ORDER BY transfer_history.transferred_date DESC
-            ");
-            $stmt->execute([$asset_record_id]);
-            $transfer_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            
-            $qrContent = "Category: " . htmlspecialchars($updated_asset['category_name']) .
-                "\nSub-Category: " . htmlspecialchars($updated_asset['sub_category_name']) .
-                "\nRoom Type: " . htmlspecialchars($updated_asset['room_type_name']) .
-                "\nRoom: " . htmlspecialchars($updated_asset['room_name']) .
-                "\nAsset: " . htmlspecialchars($updated_asset['asset_name']) .
-                "\nPerson In Charge: " . htmlspecialchars($updated_asset['person_in_charge_name']) .
-                "\n\nComment: " . htmlspecialchars($comment) .
-                "\nLast Inspected: " . htmlspecialchars($timestamp) .
-                "\n\nTransfer History:\n";
-
-            foreach ($transfer_history as $transfer) {
-                $qrContent .= "Room: " . htmlspecialchars($transfer['room_name']) .
-                    " | Person In Charge: " . htmlspecialchars($transfer['person_in_charge_name']) .
-                    " | Transferred Date: " . htmlspecialchars($transfer['transferred_date']) .
-                    " | Transferred By: " . htmlspecialchars($transfer['transferred_by_name']) .
-                    " | Comments: " . htmlspecialchars($transfer['comments']) . "\n";
-            }
-
-            $qrCodeDir = 'qrcodes';
-            if (!is_dir($qrCodeDir)) {
-                mkdir($qrCodeDir, 0777, true);
-            }
-            $qrFilePath = $qrCodeDir . '/' . htmlspecialchars($updated_asset['asset_name']) . '_' . $asset_record_id . '.png';
-            QRcode::png($qrContent, $qrFilePath, QR_ECLEVEL_L, 3);
-
-            $stmt = $conn->prepare("
-                UPDATE asset_records 
-                SET qrcode = ?
-                WHERE id = ?
-            ");
-            $stmt->execute([$qrFilePath, $asset_record_id]);
-
-            $_SESSION['success_message'] = 'Comment and QR code updated successfully.';
-        } catch (PDOException $e) {
-            $_SESSION['error_message'] = 'Error updating comment: ' . $e->getMessage();
-        }
-        header('Location: view_assets.php');
-        exit();
-    } else {
-        $_SESSION['error_message'] = 'Comment cannot be empty.';
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -217,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <a href="view_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> View Requests</button>
                         </a>
-                        <a href="procurement.php">
+                        <a href="generate_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Generate Request</button>
                         </a>
                     </div>
@@ -253,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="reports.php">
                         <button class="nav-icon fas fa-folder text-white text-sm"> Reports</button>
                     </a>
-                    <a href="procurement.php">
+                    <a href="generate_request.php">
                         <button class="far fa-circle nav-icon text-white text-sm"> Generate Request</button>
                     </a>
                     <a href="logout.php" onclick="confirmLogout(event)">

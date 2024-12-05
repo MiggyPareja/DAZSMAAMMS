@@ -86,7 +86,7 @@ $username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
                         <a href="view_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> View Requests</button>
                         </a>
-                        <a href="procurement.php">
+                        <a href="generate_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Generate Request</button>
                         </a>
                     </div>
@@ -122,7 +122,7 @@ $username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
                     <a href="reports.php">
                         <button class="nav-icon fas fa-folder text-white text-sm"> Reports</button>
                     </a>
-                    <a href="procurement.php">
+                    <a href="generate_request.php">
                         <button class="far fa-circle nav-icon text-white text-sm"> Generate Request</button>
                     </a>
                     <a href="logout.php" onclick="confirmLogout(event)">
@@ -198,7 +198,7 @@ $percentageAssigned = ($assignedAssets / $totalAssets) * 100;
             MONTHNAME(date) as month, 
             COUNT(id) as request_count
         FROM 
-            procurement_requests
+            generate_request_requests
         WHERE 
             status = 'pending' -- Filter by status if needed
         GROUP BY 

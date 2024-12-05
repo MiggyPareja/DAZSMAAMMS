@@ -28,7 +28,7 @@ try {
 
     if ($approvalExists == 0) {
         // Retrieve current approval count
-        $sql = "SELECT approve_count, particular_asset, quantity FROM transfer_history JOIN procurement_requests ON transfer_history.id = procurement_requests.id WHERE transfer_history.id = :request_id";
+        $sql = "SELECT approve_count, particular_asset, quantity FROM transfer_history JOIN generate_request_requests ON transfer_history.id = generate_request_requests.id WHERE transfer_history.id = :request_id";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':request_id', $request_id, PDO::PARAM_INT);
         $stmt->execute();

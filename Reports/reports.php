@@ -226,7 +226,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['users'])) {
                         <a href="../Records/view_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> View Requests</button>
                         </a>
-                        <a href="../Records/procurement.php">
+                        <a href="../Records/generate_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Generate Request</button>
                         </a>
                     </div>
@@ -262,7 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['users'])) {
                     <a href="reports.php">
                         <button class="nav-icon fas fa-folder text-white text-sm"> Reports</button>
                     </a>
-                    <a href="../Records/procurement.php">
+                    <a href="../Records/generate_request.php">
                         <button class="far fa-circle nav-icon text-white text-sm"> Generate Request</button>
                     </a>
                     <a href="../logout.php" onclick="confirmLogout(event)">

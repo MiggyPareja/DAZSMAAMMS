@@ -29,7 +29,7 @@ $username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
     FROM 
         categories c
     LEFT JOIN assets ar ON ar.category_id = c.id
-    LEFT JOIN procurement_requests pr ON ar.person_in_charge_id = pr.person_in_charge_id
+    LEFT JOIN generate_request_requests pr ON ar.person_in_charge_id = pr.person_in_charge_id
         AND pr.status = 'Approved'
     GROUP BY 
         c.name;
@@ -114,7 +114,7 @@ $assetList = $assetQuery->fetchAll(PDO::FETCH_ASSOC);
                         <a href="../Records/view_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> View Requests</button>
                         </a>
-                        <a href="../Records/procurement.php">
+                        <a href="../Records/generate_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Generate Request</button>
                         </a>
                     </div>
@@ -150,7 +150,7 @@ $assetList = $assetQuery->fetchAll(PDO::FETCH_ASSOC);
                     <a href="reports.php">
                         <button class="nav-icon fas fa-folder text-white text-sm"> Reports</button>
                     </a>
-                    <a href="../Records/procurement.php">
+                    <a href="../Records/generate_request.php">
                         <button class="far fa-circle nav-icon text-white text-sm"> Generate Request</button>
                     </a>
                     <a href="../logout.php" onclick="confirmLogout(event)">

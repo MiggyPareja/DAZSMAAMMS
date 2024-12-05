@@ -14,7 +14,7 @@ $request_id = $_POST['request_id'];
 
 // Fetch request details
 try {
-    $sql = "SELECT * FROM procurement_requests WHERE id = :request_id";
+    $sql = "SELECT * FROM generate_request_requests WHERE id = :request_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':request_id', $request_id, PDO::PARAM_INT);
     $stmt->execute();
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['unit_cost']) && isset(
     $amount = $_POST['amount'];
 
     try {
-        $sql = "UPDATE procurement_requests SET unit_cost = :unit_cost, amount = :amount WHERE id = :request_id";
+        $sql = "UPDATE generate_request_requests SET unit_cost = :unit_cost, amount = :amount WHERE id = :request_id";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':unit_cost', $unit_cost);
         $stmt->bindParam(':amount', $amount);

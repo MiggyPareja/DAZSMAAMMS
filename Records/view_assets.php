@@ -124,12 +124,12 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
             echo '<script>alert("Asset marked as disposed successfully."); window.location.href = "view_assets.php";</script>'; // Redirect to dispose_assets.php
         } elseif ($action === 'approve' && $role === 'Approver') {
             // Your logic for approving a request
-            $stmt = $conn->prepare("UPDATE procurement_requests SET status = 'Approved' WHERE id = ?");
+            $stmt = $conn->prepare("UPDATE generate_request_requests SET status = 'Approved' WHERE id = ?");
             $stmt->execute([$id]);
             echo '<script>alert("Request approved successfully."); window.location.href = "view_requests.php";</script>';
         } elseif ($action === 'deny' && $role === 'Approver') {
             // Your logic for denying a request
-            $stmt = $conn->prepare("UPDATE procurement_requests SET status = 'Denied' WHERE id = ?");
+            $stmt = $conn->prepare("UPDATE generate_request_requests SET status = 'Denied' WHERE id = ?");
             $stmt->execute([$id]);
             echo '<script>alert("Request denied successfully."); window.location.href = "view_requests.php";</script>';
         }
@@ -220,7 +220,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
                         <a href="view_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> View Requests</button>
                         </a>
-                        <a href="procurement.php">
+                        <a href="generate_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Generate Request</button>
                         </a>
                     </div>
@@ -256,7 +256,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
                     <a href="../Reports/reports.php">
                         <button class="nav-icon fas fa-folder text-white text-sm"> Reports</button>
                     </a>
-                    <a href="../Reports/procurement.php">
+                    <a href="../Reports/generate_request.php">
                         <button class="far fa-circle nav-icon text-white text-sm"> Generate Request</button>
                     </a>
                     <a href="../logout.php" onclick="confirmLogout(event)">

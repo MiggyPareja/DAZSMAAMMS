@@ -16,7 +16,7 @@ $action = $_POST['action'];
 try {
     if ($action === 'approve') {
         // Check if the user has already approved this request
-        $sql = "SELECT COUNT(*) FROM procurementapprove WHERE procurement_requestsID = :request_id AND userID = :user_id";
+        $sql = "SELECT COUNT(*) FROM generate_requestapprove WHERE generate_request_requestsID = :request_id AND userID = :user_id";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':request_id', $request_id, PDO::PARAM_INT);
         $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT); 
@@ -25,7 +25,7 @@ try {
         
         if ($approvalExists == 0) {
             // Get the current approve counter
-            $sql = "SELECT approveCounter FROM procurement_requests WHERE id = :request_id";
+            $sql = "SELECT approveCounter FROM generate_request_requests WHERE id = :request_id";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':request_id', $request_id, PDO::PARAM_INT);
             $stmt->execute();
@@ -40,10 +40,10 @@ try {
         
                 if ($approve_count < 4) {
                     $approve_count++;
-                    $sql = "UPDATE procurement_requests SET approveCounter = :approve_count WHERE id = :request_id";
+                    $sql = "UPDATE generate_request_requests SET approveCounter = :approve_count WHERE id = :request_id";
                 } else {
                     $approve_count++;
-                    $sql = "UPDATE procurement_requests SET approveCounter = :approve_count, status = 'Approved' WHERE id = :request_id";
+                    $sql = "UPDATE generate_request_requests SET approveCounter = :approve_count, status = 'Approved' WHERE id = :request_id";
                 }
         
                 $stmt = $conn->prepare($sql);
@@ -52,14 +52,14 @@ try {
                 $stmt->execute();
         
                 // Insert the approval into approveTable
-                $sql = "INSERT INTO procurementapprove (procurement_requestsID	, userID) VALUES (:request_id, :user_id)";
+                $sql = "INSERT INTO generate_requestapprove (generate_request_requestsID	, userID) VALUES (:request_id, :user_id)";
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(':request_id', $request_id, PDO::PARAM_INT);
                 $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
                 $stmt->execute();
         
                 // Log the activity
-                $activity = "Approved Procurement Request";
+                $activity = "Approved generate_request Request";
                 $stmt = $conn->prepare("INSERT INTO userlogs (userID, activity) VALUES (:userID, :activity)");
                 $stmt->bindParam(':userID', $user_id);
                 $stmt->bindParam(':activity', $activity);
@@ -73,7 +73,7 @@ try {
             exit;
         }
     } elseif ($action === 'deny') {
-        $sql = "UPDATE procurement_requests SET status = 'Denied' WHERE id = :request_id";
+        $sql = "UPDATE generate_request_requests SET status = 'Denied' WHERE id = :request_id";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':request_id', $request_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -82,7 +82,7 @@ try {
     }
 
     // Log the deny action
-    $activity = "Denied Procurement Request";
+    $activity = "Denied generate_request Request";
     $stmt = $conn->prepare("INSERT INTO userlogs (userID, activity) VALUES (:userID, :activity)");
     $stmt->bindParam(':userID', $user_id);
     $stmt->bindParam(':activity', $activity);

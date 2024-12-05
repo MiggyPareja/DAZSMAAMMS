@@ -117,7 +117,7 @@ if (isset($_GET['delete_id'])) {
                         <a href="../Records/view_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> View Requests</button>
                         </a>
-                        <a href="../Records/procurement.php">
+                        <a href="../Records/generate_request.php">
                             <button class="far fa-circle nav-icon text-white text-xs"> Generate Request</button>
                         </a>
                     </div>
@@ -153,7 +153,7 @@ if (isset($_GET['delete_id'])) {
                     <a href="../Reports/reports.php">
                         <button class="nav-icon fas fa-folder text-white text-sm"> Reports</button>
                     </a>
-                    <a href="../Reports/procurement.php">
+                    <a href="../Reports/generate_request.php">
                         <button class="far fa-circle nav-icon text-white text-sm"> Generate Request</button>
                     </a>
                     <a href="../logout.php" onclick="confirmLogout(event)">
