@@ -42,28 +42,31 @@ $firstname = $user ? htmlspecialchars($user['first_name']) : 'Unknown User';
 
             <!-- Collapsible Records Section -->
             <a>
-                <button id="recordsBtn" class="nav-icon fas fa-folder text-white text-sm"> Records
+                <button id="recordsBtn" class="nav-icon fas fa-folder text-white text-sm"> Assets
                     <span id="arrow" class="transform transition-transform">&#9660;</span>
                 </button>
             </a>
             <div id="recordsMenu" class="hidden flex flex-col p-2 space-y-3">
-                <a href="../Records/view_assets.php">
-                    <button class="far fa-circle nav-icon text-white text-xs"> View Assets</button>
-                </a>
-                <?php if ($role == 'Admin' || $role == 'Property Custodian'): ?>
-                    <a href="../Records/dispose_assets.php">
-                        <button class="far fa-circle nav-icon text-white text-xs"> View Disposed Assets</button>
-                    </a>
-                    <a href="../Records/add_assets.php">
-                        <button class="far fa-circle nav-icon text-white text-xs"> Deploy Assets</button>
-                    </a>
-                <?php endif; ?>
-                <a href="../Records/view_request.php">
-                    <button class="far fa-circle nav-icon text-white text-xs"> View Requests</button>
-                </a>
-                <a href="../Records/procurement.php">
+            <a href="../Records/procurement.php">
                     <button class="far fa-circle nav-icon text-white text-xs"> Generate Request</button>
+            </a>
+            <a href="../Records/view_request.php">
+                    <button class="far fa-circle nav-icon text-white text-xs"> View Requests</button>
+            </a>            
+            <a href="../Records/add_assets.php">
+                        <button class="far fa-circle nav-icon text-white text-xs"> Deploy Assets</button>
+            </a>            
+            <a href="../Records/view_assets.php">
+                    <button class="far fa-circle nav-icon text-white text-xs"> View Assets</button>
+            </a>
+            <?php if ($role == 'Admin' || $role == 'Property Custodian'): ?>
+                <a href="../Records/dispose_assets.php">
+                <button class="far fa-circle nav-icon text-white text-xs"> View Disposed Assets</button>
                 </a>
+
+                <?php endif; ?>
+
+
             </div>
             
             <!-- Reports -->
