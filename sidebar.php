@@ -95,9 +95,6 @@ $firstname = $user ? htmlspecialchars($user['first_name']) : 'Unknown User';
 
         <?php elseif ($role == 'Faculty'): ?>
             <!-- Faculty Specific Options -->
-            <a href="../reports.php">
-                <button class="nav-icon fas fa-folder text-white text-sm"> Reports</button>
-            </a>
             <a href="../Records/procurement.php">
                 <button class="far fa-circle nav-icon text-white text-sm"> Generate Request</button>
             </a>
