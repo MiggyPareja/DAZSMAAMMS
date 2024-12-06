@@ -80,7 +80,11 @@ require '../includes/db.php';
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <a href="../dashboard.php" class="text-blue-500 hover:text-blue-700">Add Custom Brand and Models</a>
+                    <a href="javascript:void(0);" 
+                        class="text-blue-500 hover:text-blue-700" 
+                        onclick="showModal('deploymentModal')">
+                        Add Custom Brand and Models
+                    </a>
                 </div>
                 <div>
                     <label for="model" class="block text-gray-700 font-medium">Model:</label>
@@ -110,8 +114,73 @@ require '../includes/db.php';
 
             <button type="submit" class="w-full py-2 bg-blue-500 text-white font-bold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Submit Form</button>
         </form>
+    </div> 
+</div>
+
+<!-- Deployment Modal -->
+<div id="deploymentModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+        <h2 class="text-xl font-bold mb-4">Deploy Asset</h2>
+        <form id="deployForm">
+            <input type="hidden" id="requestId" name="requestId">
+            <div id="inputContainer">
+                <div class="mb-4 input-group">
+                    <label for="assetName" class="block font-medium">Asset Name</label>
+                    <input type="text" name="assetName[]" class="w-full border rounded p-2">
+                </div>
+                <div class="mb-4 input-group">
+                    <label for="roomId" class="block font-medium">Room ID</label>
+                    <input type="text" name="roomId[]" class="w-full border rounded p-2">
+                </div>
+                <div class="mb-4 input-group">
+                    <label for="personInChargeId" class="block font-medium">Person in Charge ID</label>
+                    <input type="text" name="personInChargeId[]" class="w-full border rounded p-2">
+                </div>
+            </div>
+            <div class="flex justify-between items-center mb-4">
+                <button type="button" onclick="addInputGroup()" class="bg-blue-500 text-white px-4 py-2 rounded">Add Another One</button>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded" onclick="closeModal('deploymentModal')">Cancel</button>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Deploy</button>
+            </div>
+        </form>
     </div>
 </div>
+
+<!-- Script to Handle Modal and Dynamic Input -->
+<script>
+    function showModal(modalId) {
+        document.getElementById(modalId).classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function addInputGroup() {
+        const inputContainer = document.getElementById('inputContainer');
+
+        // Create a new input group
+        const newInputGroup = document.createElement('div');
+        newInputGroup.classList.add('mb-4', 'input-group');
+        newInputGroup.innerHTML = `
+            <div class="mb-4">
+                <label class="block font-medium">Asset Name</label>
+                <input type="text" name="assetName[]" class="w-full border rounded p-2">
+            </div>
+            <div class="mb-4">
+                <label class="block font-medium">Room ID</label>
+                <input type="text" name="roomId[]" class="w-full border rounded p-2">
+            </div>
+            <div class="mb-4">
+                <label class="block font-medium">Person in Charge ID</label>
+                <input type="text" name="personInChargeId[]" class="w-full border rounded p-2">
+            </div>
+        `;
+        inputContainer.appendChild(newInputGroup);
+    }
+</script>
 
 
 
