@@ -20,6 +20,7 @@
 
 <?php include '../sidebar.php'; ?>
 <?php include __DIR__ . '/fetch_requests.php'; ?>
+<?php include __DIR__ . '/deploy_asset.php'; ?>
 
 <div class="flex-1 ml-64 p-4">
     <div class="assets-table mt-8 p-4 rounded-lg bg-white">
@@ -57,7 +58,8 @@
                     <td><?php echo htmlspecialchars($request['status']); ?></td>
                     <td>
                         <div class="flex justify-center gap-2">
-                            <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Deploy</button>
+                           <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" onclick="openModal(<?php echo $request['procurement_request_id']; ?>)">Deploy</button>
+
                             <?php if ($role == 'Admin' || $role == 'Property Custodian'): ?>
                             <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Dispose</button>
                             <?php endif; ?>
@@ -67,6 +69,32 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- Deployment Modal -->
+<div id="deploymentModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-xl font-bold mb-4">Deploy Asset</h2>
+        <form id="deployForm">
+            <input type="hidden" id="requestId" name="requestId">
+            <div class="mb-4">
+                <label for="assetName" class="block font-medium">Asset Name</label>
+                <input type="text" id="assetName" name="assetName" class="w-full border rounded p-2">
+            </div>
+            <div class="mb-4">
+                <label for="roomId" class="block font-medium">Room ID</label>
+                <input type="text" id="roomId" name="roomId" class="w-full border rounded p-2">
+            </div>
+            <div class="mb-4">
+                <label for="personInChargeId" class="block font-medium">Person in Charge ID</label>
+                <input type="text" id="personInChargeId" name="personInChargeId" class="w-full border rounded p-2">
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Deploy</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -80,6 +108,37 @@
             ordering: true,  // enable sorting functionality
             responsive: true, // make the table responsive on smaller screens
         });
+    });
+
+    function openModal(requestId) {
+        document.getElementById('requestId').value = requestId;
+        document.getElementById('deploymentModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('deploymentModal').classList.add('hidden');
+    }
+
+    document.getElementById('deployForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch('deploy_asset.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Asset deployed successfully');
+                closeModal();
+                location.reload();
+            } else {
+                alert('Error deploying asset: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
     });
 </script>
 

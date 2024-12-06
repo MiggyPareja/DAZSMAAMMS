@@ -85,7 +85,7 @@ $firstname = $user ? htmlspecialchars($user['first_name']) : 'Unknown User';
                             Inventory
                         </button>
                     </a>  
-                    <a href="../Records/add_assets.php">
+                    <a href="../Records/deployed_assets.php">
                         <button class="far fa-circle nav-icon text-white text-xs"> 
                             Deployed Assets
                         </button>
