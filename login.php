@@ -136,9 +136,6 @@ background-position: center;
                 <?php else: ?>
                 
                 <?php endif; ?>
-                <p class="mt-4 text-center text-white">
-                    <a href="register.php" class="underline">Create Account Here.</a>
-                </p>
             </form>
         </div>
 </body>
