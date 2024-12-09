@@ -36,7 +36,7 @@ require __DIR__ . '/../includes/db.php';
     <div class="assets-table mt-8 p-4 rounded-lg bg-white">
         <h1 class="text-2xl font-bold mb-4">Request Dashboard</h1>
         
-        <!-- Table displaying procurement requests -->
+        <!-- Table displaying inventory requests -->
         <table id="requestsTable" class="display w-full">
             <thead>
                 <tr>
@@ -49,36 +49,40 @@ require __DIR__ . '/../includes/db.php';
                     <th>Brand</th>
                     <th>Model</th>
                     <th>Specs</th>
+                    <th>Category</th>
+                    <th>Sub-Category</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($requests as $request): ?>
-                <tr id="row-<?php echo htmlspecialchars($request['procurement_request_id']); ?>">
-                    <td><?php echo htmlspecialchars($request['procurement_request_id']); ?></td>
+                <tr id="row-<?php echo htmlspecialchars($request['id']); ?>">
+                    <td><?php echo htmlspecialchars($request['id']); ?></td>
                     <td><?php echo htmlspecialchars($request['department_name']); ?></td>
-                    <td><?php echo htmlspecialchars($request['request_date']); ?></td>
+                    <td><?php echo htmlspecialchars($request['created_at']); ?></td>
                     <td><?php echo htmlspecialchars($request['last_name'].','.$request['first_name']); ?></td>
                     <td><?php echo htmlspecialchars($request['quantity']); ?></td>
                     <td><?php echo htmlspecialchars($request['unit_cost']); ?></td>
                     <td><?php echo htmlspecialchars($request['brand_name']); ?></td>
                     <td><?php echo htmlspecialchars($request['model_name']); ?></td>
                     <td><?php echo htmlspecialchars($request['specs']); ?></td>
-                    <td id="status-<?php echo htmlspecialchars($request['procurement_request_id']); ?>">
+                    <td><?php echo htmlspecialchars($request['category_name']); ?></td>
+                    <td><?php echo htmlspecialchars($request['subcategory_name']); ?></td>
+                    <td id="status-<?php echo htmlspecialchars($request['id']); ?>">
                         <?php echo htmlspecialchars($request['status']); ?>
                     </td>
                     <td>
                         <div class="flex justify-center gap-2">
                             <button 
                                 class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" 
-                                onclick="updateStatus('<?php echo $request['procurement_request_id']; ?>', 'Approved')"
+                                onclick="updateStatus('<?php echo $request['id']; ?>', 'Approved')"
                             >
                                 Approve
                             </button>
                             <button 
                                 class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" 
-                                onclick="updateStatus('<?php echo $request['procurement_request_id']; ?>', 'Declined')"
+                                onclick="updateStatus('<?php echo $request['id']; ?>', 'Declined')"
                             >
                                 Decline
                             </button>
@@ -90,6 +94,7 @@ require __DIR__ . '/../includes/db.php';
         </table>
     </div>
 </div>
+
 
 <script>
     $(document).ready(function() {
@@ -104,7 +109,7 @@ require __DIR__ . '/../includes/db.php';
 
     function updateStatus(requestId, newStatus) {
         // Make an AJAX request to update the status in the backend
-        fetch('update_requests.php', {
+        fetch('update_request.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

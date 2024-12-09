@@ -24,6 +24,7 @@ require '../includes/db.php';
         
 <?php include '../sidebar.php'; ?>
 <?php include './generateRequest.php'; ?>
+<?php include './fetch_subcategories.php'; ?>
 
       
 <div class="flex-1 flex flex-col items-center justify-center ml-64 top-0 p-6">
@@ -67,6 +68,29 @@ require '../includes/db.php';
                     </select>
                 </div>
             </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Category Dropdown -->
+                        <div>
+                            <label for="category" class="block text-gray-700 font-medium">Category:</label>
+                            <select id="category" name="category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="fetchSubcategories(this.value)" required>
+                                <option value="">Select Category</option>
+                                <?php foreach ($categories as $category): ?>
+                                    <option value="<?php echo htmlspecialchars($category['category_id']); ?>">
+                                        <?php echo htmlspecialchars($category['name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <!-- Subcategory Dropdown -->
+                        <div>
+                            <label for="subcategory" class="block text-gray-700 font-medium">Subcategory:</label>
+                            <select id="subcategory" name="subcategory" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                <option value="">Select Subcategory</option>
+                            </select>
+                        </div>
+                    </div>
+
 
             <!-- Brand and Model (Dropdowns) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -105,7 +129,7 @@ require '../includes/db.php';
             <!-- Specs (Textarea instead of input) -->
             <div>
                 <label for="specs" class="block text-gray-700 font-medium">Specs:</label>
-                <textarea id="specs" name="specs" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter Specs" rows="6" style="resize: none;"></textarea>
+                <textarea id="specs" name="specs" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter Specs" rows="6" style="resize: none; "></textarea>
             </div>
 
             <button type="submit" class="w-full py-2 bg-blue-500 text-white font-bold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Submit Form</button>
@@ -124,7 +148,6 @@ require '../includes/db.php';
         return;
     }
 
-    // Create a new XMLHttpRequest object
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "fetch_models.php?brand_id=" + brandId, true);
 
@@ -143,6 +166,52 @@ require '../includes/db.php';
     };
     xhr.send();
 }
+
+ // Fetch subcategories based on selected category
+function fetchSubcategories(categoryId) {
+    const subcategoryDropdown = document.getElementById('subcategory');
+    subcategoryDropdown.innerHTML = '<option value="">Loading...</option>'; // Show loading message
+    
+    console.log("Fetching subcategories for categoryId:", categoryId); // Debugging line
+    
+    // Fetch subcategories from the server via AJAX (using fetch API)
+    fetch('fetch_subcategories.php?category_id=' + categoryId)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Subcategories data received:", data); // Debugging line
+
+            // Clear the subcategory dropdown
+            subcategoryDropdown.innerHTML = '<option value="">Select Subcategory</option>';
+            
+            // Check if the data is not empty
+            if (data.length > 0) {
+                // Populate the subcategory dropdown with options
+                data.forEach(subcategory => {
+                    const option = document.createElement('option');
+                    option.value = subcategory.subcategory_id;
+                    option.textContent = subcategory.name;
+                    subcategoryDropdown.appendChild(option);
+                });
+            } else {
+                subcategoryDropdown.innerHTML = '<option value="">No subcategories available</option>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching subcategories:', error);
+            subcategoryDropdown.innerHTML = '<option value="">Failed to load subcategories</option>';
+        });
+}
+
+// Event listener for category change
+document.getElementById('category').addEventListener('change', function () {
+    const categoryId = this.value;
+    console.log("Category changed, selected categoryId:", categoryId); // Debugging line
+    if (categoryId) {
+        fetchSubcategories(categoryId);
+    } else {
+        document.getElementById('subcategory').innerHTML = '<option value="">Select Subcategory</option>';
+    }
+});
 
 
 </script>

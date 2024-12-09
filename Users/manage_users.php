@@ -1,55 +1,7 @@
 <?php
-session_start();
-require '../includes/db.php';
-
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit();
-}
-
-$user_id = $_SESSION['user_id'];
-$role = $_SESSION['role'];
-
-// Fetch username from the database
-$stmt = $conn->prepare("SELECT username FROM users WHERE user_id = ?");
-$stmt->execute([$user_id]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-$username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
-
-// Fetch user records from the database
-$stmt = $conn->prepare("SELECT 
-    users.user_id, 
-    users.username, 
-    users.role, 
-    users.first_name,
-    users.Last_name
-FROM 
-    users
-
-WHERE 
-    users.status = 'Active';
-");
-$stmt->execute();
-$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Handle user deletion
-if (isset($_GET['delete_id'])) {
-    $delete_id = intval($_GET['delete_id']);
-    $stmt = $conn->prepare("UPDATE users SET status='Deactivate' WHERE id = :id");
-    $stmt->bindParam(':id', $delete_id);
-    $stmt->execute();
-    echo '<script>alert("User Deactiviated Successfully"); window.location.href = "manage_users.php";</script>';
-    exit();
-}
+// Assuming you're fetching departments from the database to populate the department dropdown
+// You may need to adjust this part based on your department table and database query
 ?>
-
-
-<script>
-    function confirmAction(message) {
-        return confirm(message);
-    }
-</script>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -58,174 +10,169 @@ if (isset($_GET['delete_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DAZSMA Dashboard</title>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-          @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-* {
-    font-family: 'Poppins', sans-serif;
-}
-</style>
+    <!-- Google Font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
+
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+    <!-- jQuery and DataTables JS -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 
 </head>
 
-<body class="bg-cover bg-center h-screen"
-    style="background-image: linear-gradient(110deg, rgba(32, 32, 146, 0.55) 100%, #202092 45%), url('images/Background.png');">
-        <a>
-        <div class="bg-blue-900 w-64 flex flex-col p-4 fixed h-full space-y-4 z-20">
-              <div class="image">
-                  <img src="images/SYSTEM LOGO 2.png" alt="User Image" class="text-white text-left">
-              </div>
-        </a>
+<body class="bg-cover bg-center h-screen">
+    <?php include '../sidebar.php'; ?>
+    <?php include './fetch_users.php'; ?>
 
+    <!-- Manage Users Section -->
+    <div class="flex-1 ml-64 p-4">
+        <div>
+            <h2 class="text-white text-2xl font-bold mb-4">Manage Users</h2>
+            
+            <!-- Button to Open Add User Modal -->
+            <button id="openModal" class="inline-block bg-blue-500 text-white py-2 px-4 rounded-md mb-4">Add New User</button>
 
-
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-              <div class="image">
-                  <img src="images/avatar.png" class="rounded-full w-12 h-12" alt="User Image">
-              </div>
-              <div class="info">
-                  <a href="#" class="d-block text-white"><?php echo $username; ?></a>
-              </div>
-          </div>
-            <nav class="flex flex-col space-y-4">
-                <?php if ($role == 'Admin' || $role == 'Property Custodian' || $role == 'Inspector'): ?>
-                    <!-- Dashboard -->
-                    <a href="../dashboard.php">
-                        <button class="nav-icon fas fa-tachometer-alt text-white text-sm"> Dashboard</button>             
-                    </a>
-
-                    <!-- Collapsible Records Section -->
-                    <a>
-                    <button id="recordsBtn" class="nav-icon fas fa-folder text-white text-sm"> Records
-    <span id="arrow" class="transform transition-transform">&#9660;</span>
-</button></a>
-                    <div id="recordsMenu" class="hidden flex flex-col p-2 space-y-3">
-                        <a href="../Records/view_assets.php">
-                            <button class="far fa-circle nav-icon text-white text-xs"> View Assets</button>
-                        </a>
-                        <?php if ($role == 'Admin' || $role == 'Property Custodian'): ?>
-                        <a href="../Records/dispose_assets.php">
-                            <button class="far fa-circle nav-icon text-white text-xs"> View Disposed Assets</button>
-                        </a>
-                        <a href="../Records/add_assets.php">
-                            <button class="far fa-circle nav-icon text-white text-xs"> Deploy Assets</button>
-                        </a>
-                        <?php endif; ?>
-                        <a href="../Records/view_request.php">
-                            <button class="far fa-circle nav-icon text-white text-xs"> View Requests</button>
-                        </a>
-                        <a href="../Records/generate_request.php">
-                            <button class="far fa-circle nav-icon text-white text-xs"> Generate Request</button>
-                        </a>
-                    </div>
-                    
-                    <!-- Reports -->
-                    <a>
-                    <button id="reportsBtn" class="nav-icon fas fa-chart-bar text-white text-sm"> Reports
-    <span id="arrow" class="transform transition-transform">&#9660;</span>
-</button></a>
-                    <div id="../Reports/reportsMenu" class="hidden flex flex-col p-2 space-y-3">
-                        <a href="../Reports/reports.php">
-                            <button class="far fa-circle nav-icon text-white text-xs"> Person-In-Charge</button>
-                        </a>
-                        <a href="../Reports/asset_durability.php">
-                            <button class="far fa-circle nav-icon text-white text-xs"> Asset Durability</button>
-                        </a>
-                    </div>
-
-                    <!-- User Management for Admin Only -->
-                    <?php if ($role == 'Admin'): ?>
-                        <a href="manage_users.php">
-                            <button class="nav-icon fas fa-id-card text-white text-sm"> User Management</button>
-                        </a>
-                    <?php endif; ?>
-
-                    <!-- Log Out -->
-                    <a href="../logout.php" onclick="confirmLogout(event)">
-                        <button class="nav-icon fas fa-sign-out-alt text-white text-sm"> Log Out</button>
-                    </a>
-
-                <?php elseif ($role == 'Faculty'): ?>
-                    <!-- Faculty Specific Options -->
-                    <a href="../Reports/reports.php">
-                        <button class="nav-icon fas fa-folder text-white text-sm"> Reports</button>
-                    </a>
-                    <a href="../Reports/generate_request.php">
-                        <button class="far fa-circle nav-icon text-white text-sm"> Generate Request</button>
-                    </a>
-                    <a href="../logout.php" onclick="confirmLogout(event)">
-                        <button class="nav-icon fas fa-sign-out-alt text-white text-sm"> Log Out</button>
-                    </a>
-                <?php endif; ?>
-            </nav>
+            <!-- User Table -->
+            <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+                <table id="usersTable" class="min-w-full table-auto">
+                    <thead class="bg-white text-black">
+                        <tr>
+                            <th class="px-6 py-3 text-left">ID Number</th>
+                            <th class="px-6 py-3 text-left">Username</th>
+                            <th class="px-6 py-3 text-left">Email</th>
+                            <th class="px-6 py-3 text-left">Role</th>
+                            <th class="px-6 py-3 text-left">Status</th>
+                            <th class="px-6 py-3 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        foreach ($users as $user) {  // Modify according to how you fetch users
+                        ?>
+                        <tr>
+                            <td class="px-6 py-4"><?= $user['id_number']; ?></td>
+                            <td class="px-6 py-4"><?= $user['username']; ?></td>
+                            <td class="px-6 py-4"><?= $user['email']; ?></td>
+                            <td class="px-6 py-4"><?= $user['role']; ?></td>
+                            <td class="px-6 py-4"><?= $user['status']; ?></td>
+                            <td class="px-6 py-4">
+                                <a href="edit_user.php?id=<?= $user['user_id']; ?>" class="text-yellow-500 hover:text-yellow-700">Edit(Under Construction)</a> |
+                                <a href="delete_user.php?id=<?= $user['user_id']; ?>" class="text-red-500 hover:text-red-700" onclick="return confirm('Are you sure you want to delete this user?')">Delete(Under Construction)</a> |
+                                <?php if ($user['status'] == 'Inactive') { ?>
+                                    <a href="reactivate_user.php?id=<?= $user['user_id']; ?>" class="text-green-500 hover:text-green-700" onclick="return confirm('Are you sure you want to reactivate this user?')">Reactivate(Under Construction)</a>
+                                <?php } ?>
+                            </td>
+                        </tr>
+                        <?php
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
-
-      
-<script>
-        document.getElementById('recordsBtn').addEventListener('click', function () {
-            const recordsMenu = document.getElementById('recordsMenu');
-            const arrow = document.getElementById('arrow');
-            recordsMenu.classList.toggle('hidden');
-            arrow.classList.toggle('rotate-180');
-        });
-
-        document.getElementById('reportsBtn').addEventListener('click', function () {
-            const reportsMenu = document.getElementById('reportsMenu');
-            const arrow = document.getElementById('arrow');
-            reportsMenu.classList.toggle('hidden');
-            arrow.classList.toggle('rotate-180');
-        });
-</script>
-    
-        <div class="flex-1 flex flex-col items-center justify-center top-0 ml-64">
-  
-        <div class="bg-white rounded-xl p-8 shadow-lg  w-full max-w-4xl">
-        <?php if (!empty($error))
-            echo '<p class="error">' . $error . '</p>'; ?>
-               <div class="p-6 bg-white shadow-mdrounded-lg">
-    <h2 class="text-2xl font-bold mb-4">Manage Users</h2>
-    <div class="flex justify-between mb-4">
-        <a href="add_user.php" class="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600 transition">Add User</a>
     </div>
-    <table class="min-w-full bg-white border rounded-lg">
-        <thead>
-            <tr>
-            <th class="py-2 px-4 border-b-2 border-gray-300 text-left text-sm font-semibold text-gray-700">Fullname</th>
 
-                <th class="py-2 px-4 border-b-2 border-gray-300 text-left text-sm font-semibold text-gray-700">Email</th>
-                <th class="py-2 px-4 border-b-2 border-gray-300 text-left text-sm font-semibold text-gray-700">Role</th>
-                <th class="py-2 px-4 border-b-2 border-gray-300 text-left text-sm font-semibold text-gray-700">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($users as $user): ?>
-                <tr>
-                <td class="py-2 px-4 border-b border-gray-300 text-sm text-gray-600"><?php echo htmlspecialchars($user['fname']).' '. htmlspecialchars($user['sname']); ?></td>
-
-                    <td class="py-2 px-4 border-b border-gray-300 text-sm text-gray-600"><?php echo htmlspecialchars($user['username']); ?></td>
-                    <td class="py-2 px-4 border-b border-gray-300 text-sm text-gray-600"><?php echo htmlspecialchars($user['role']); ?></td>
-                    <td class="py-2 px-4 border-b border-gray-300 text-sm">
-                        <a href="edit_user.php?id=<?php echo $user['id']; ?>" class="text-blue-500 hover:text-blue-700 transition">Edit</a>
-                        <a href="manage_users.php?delete_id=<?php echo $user['id']; ?>" class="text-red-500 hover:text-red-700 transition ml-4" onclick="return confirmAction('Are you sure you want to Deactivate this Account?');">Deactivate</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+<!-- Add User Modal -->
+<div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+    <div class="bg-white rounded-lg p-6 w-1/3">
+        <h2 class="text-xl font-semibold mb-4">Add New User</h2>
+        <form action="add_user.php" method="POST">
+            <!-- ID Number Field -->
+            <div class="mb-4">
+                <label for="id_number" class="block text-sm">ID Number</label>
+                <input type="text" id="id_number" name="id_number" class="w-full p-2 border border-gray-300 rounded-md" required>
+            </div>
+            <div class="mb-4">
+                <label for="username" class="block text-sm">Username</label>
+                <input type="text" id="username" name="username" class="w-full p-2 border border-gray-300 rounded-md" required>
+            </div>
+            <div class="mb-4">
+                <label for="email" class="block text-sm">Email</label>
+                <input type="email" id="email" name="email" class="w-full p-2 border border-gray-300 rounded-md" required>
+            </div>
+            <!-- Password field -->
+            <div class="mb-4">
+                <label for="password" class="block text-sm">Password</label>
+                <input type="password" id="password" name="password" class="w-full p-2 border border-gray-300 rounded-md" required>
+            </div>
+            <div class="mb-4">
+                <label for="role" class="block text-sm">Role</label>
+                <select id="role" name="role" class="w-full p-2 border border-gray-300 rounded-md" required>
+                    <option value="Admin">Admin</option>
+                    <option value="Inspector">Inspector</option>
+                    <option value="Faculty">Faculty</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="status" class="block text-sm">Status</label>
+                <select id="status" name="status" class="w-full p-2 border border-gray-300 rounded-md" required>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+            <!-- New fields based on the schema -->
+            <div class="mb-4">
+                <label for="first_name" class="block text-sm">First Name</label>
+                <input type="text" id="first_name" name="first_name" class="w-full p-2 border border-gray-300 rounded-md">
+            </div>
+            <div class="mb-4">
+                <label for="last_name" class="block text-sm">Last Name</label>
+                <input type="text" id="last_name" name="last_name" class="w-full p-2 border border-gray-300 rounded-md">
+            </div>
+            <div class="mb-4">
+                <label for="contact_number" class="block text-sm">Contact Number</label>
+                <input type="text" id="contact_number" name="contact_number" class="w-full p-2 border border-gray-300 rounded-md">
+            </div>
+            <div class="mb-4">
+                <label for="birthdate" class="block text-sm">Birthdate</label>
+                <input type="date" id="birthdate" name="birthdate" class="w-full p-2 border border-gray-300 rounded-md">
+            </div>
+            <div class="flex justify-between items-center">
+                <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md" id="closeModal">Cancel</button>
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md">Add User</button>
+            </div>
+        </form>
+    </div>
 </div>
-        </div>
-        </div>
-     
-      
-    </div>
 
 
-    <div class="absolute bottom-0 left-0 right-0 flex justify-center space-x-8 p-4">
-        <a href="#" class="text-sm font-bold text-white">HELP</a>
-    </div>
+    <!-- DataTables Initialization -->
+    <script>
+        $(document).ready(function() {
+            $('#usersTable').DataTable({
+                "paging": true, // Enable pagination
+                "searching": true, // Enable search functionality
+                "ordering": true, // Enable sorting functionality
+                "info": true, // Show table info (e.g., "Showing 1 to 10 of 50 entries")
+            });
+
+            // Open modal when the button is clicked
+            $('#openModal').click(function() {
+                $('#userModal').removeClass('hidden');
+            });
+
+            // Close modal when the close button is clicked
+            $('#closeModal').click(function() {
+                $('#userModal').addClass('hidden');
+            });
+        });
+    </script>
+
 </body>
 
 </html>

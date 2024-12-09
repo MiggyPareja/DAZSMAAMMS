@@ -16,8 +16,8 @@ try {
     // Fetch request details along with the person in charge's name
     $sql = "SELECT pr.*, pic.name AS person_in_charge_name 
             FROM generate_request_requests pr
-            LEFT JOIN persons_in_charge pic ON pr.person_in_charge_id = pic.id
-            WHERE pr.person_in_charge_id = :request_id AND pr.status = 'Approved'";
+            LEFT JOIN persons_in_charge pic ON pr.requested_by = pic.id
+            WHERE pr.requested_by = :request_id AND pr.status = 'Approved'";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':request_id', $request_id, PDO::PARAM_INT);
     $stmt->execute();

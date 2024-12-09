@@ -8,6 +8,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.16/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
@@ -25,9 +26,20 @@
 <div class="flex-1 ml-64 p-4">
     <div class="assets-table mt-8 p-4 rounded-lg bg-white">
         <h1 class="text-2xl font-bold mb-4">Inventory Dashboard</h1>
-        
+
+        <!-- Flex container for the download button and search -->
+        <div class="flex justify-between items-center mb-4">
+    <!-- Download Button -->
+            <form action="../PDF/generateInventory.php" method="POST">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Download PDF
+                </button>
+            </form>
+        </div>
+
+
         <!-- Table displaying procurement requests -->
-        <table id="requestsTable" class="display w-full">
+        <table id="requestsTable" class="display w-full table-auto border-separate border-spacing-2">
             <thead>
                 <tr>
                     <th>Request ID</th>
@@ -39,32 +51,40 @@
                     <th>Brand</th>
                     <th>Model</th>
                     <th>Specs</th>
+                    <th>Category</th>
+                    <th>Sub-Category</th>
                     <th>Status</th>
+                    <?php if ($role == 'Admin'): ?>
                     <th>Actions</th>
+                     <?php endif; ?>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($inventory as $request): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($request['procurement_request_id']); ?></td>
+                <tr id="row-<?php echo htmlspecialchars($request['id']); ?>">
+                    <td><?php echo htmlspecialchars($request['id']); ?></td>
                     <td><?php echo htmlspecialchars($request['department_name']); ?></td>
-                    <td><?php echo htmlspecialchars($request['request_date']); ?></td>
+                    <td><?php echo htmlspecialchars($request['created_at']); ?></td>
                     <td><?php echo htmlspecialchars($request['last_name'].','.$request['first_name']); ?></td>
                     <td><?php echo htmlspecialchars($request['quantity']); ?></td>
                     <td><?php echo htmlspecialchars($request['unit_cost']); ?></td>
                     <td><?php echo htmlspecialchars($request['brand_name']); ?></td>
                     <td><?php echo htmlspecialchars($request['model_name']); ?></td>
                     <td><?php echo htmlspecialchars($request['specs']); ?></td>
-                    <td><?php echo htmlspecialchars($request['status']); ?></td>
+                    <td><?php echo htmlspecialchars($request['category_name']); ?></td>
+                    <td><?php echo htmlspecialchars($request['subcategory_name']); ?></td>
+                    <td id="status-<?php echo htmlspecialchars($request['id']); ?>">
+                        <?php echo htmlspecialchars($request['status']); ?>
+                    </td>
+                    
+                    <?php if ($role == 'Admin'): ?>
                     <td>
+                        
                         <div class="flex justify-center gap-2">
-                           <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" onclick="openModal(<?php echo $request['procurement_request_id']; ?>)">Deploy</button>
-
-                            <?php if ($role == 'Admin' || $role == 'Property Custodian'): ?>
-                            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Dispose</button>
-                            <?php endif; ?>
+                           <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" onclick="openModal(<?php echo $request['id']; ?>)">Deploy</button>
                         </div>
                     </td>
+                    <?php endif; ?>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -72,24 +92,47 @@
     </div>
 </div>
 
-<!-- Deployment Modal -->
+<!-- Deployment modal -->
 <div id="deploymentModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
     <div class="bg-white p-6 rounded-lg shadow-lg">
         <h2 class="text-xl font-bold mb-4">Deploy Asset</h2>
-        <form id="deployForm">
+        <form id="deployForm" method="POST" action="deploy_asset.php">
+            <!-- Hidden Request ID -->
             <input type="hidden" id="requestId" name="requestId">
+
+            <!-- Deploy to Room (Dropdown) -->
             <div class="mb-4">
-                <label for="assetName" class="block font-medium">Asset Name</label>
-                <input type="text" id="assetName" name="assetName" class="w-full border rounded p-2">
+                <label for="deployToRoom" class="block text-sm font-medium text-gray-700">Deploy to Room:</label>
+                <select id="deployToRoom" name="deployToRoom" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">Select a Room</option>
+                    <?php foreach ($rooms as $room): ?>
+                        <option value="<?php echo htmlspecialchars($room['room_id']); ?>">
+                            <?php echo htmlspecialchars($room['name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
+
+            <!-- Deploy To (User Dropdown) -->
             <div class="mb-4">
-                <label for="roomId" class="block font-medium">Room ID</label>
-                <input type="text" id="roomId" name="roomId" class="w-full border rounded p-2">
+                <label for="deployToUser" class="block text-sm font-medium text-gray-700">Deploy To:</label>
+                <select id="deployToUser" name="deployToUser" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">Select a User</option>
+                    <?php foreach ($users as $user): ?>
+                        <option value="<?php echo htmlspecialchars($user['id_number']); ?>">
+                            <?php echo htmlspecialchars($user['last_name'] . ', ' . $user['first_name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
+
+            <!-- Comments Section -->
             <div class="mb-4">
-                <label for="personInChargeId" class="block font-medium">Person in Charge ID</label>
-                <input type="text" id="personInChargeId" name="personInChargeId" class="w-full border rounded p-2">
+                <label for="comments" class="block text-sm font-medium text-gray-700">Comments:</label>
+                <textarea id="comments" name="comments" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Add any comments here"></textarea>
             </div>
+
+            <!-- Action buttons -->
             <div class="flex justify-end gap-2">
                 <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded" onclick="closeModal()">Cancel</button>
                 <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Deploy</button>
@@ -111,34 +154,41 @@
     });
 
     function openModal(requestId) {
-        document.getElementById('requestId').value = requestId;
-        document.getElementById('deploymentModal').classList.remove('hidden');
-    }
+    // Set the hidden input with the request ID
+    document.getElementById('requestId').value = requestId;
 
-    function closeModal() {
-        document.getElementById('deploymentModal').classList.add('hidden');
-    }
+   
+    const request = <?php echo json_encode($inventory); ?>.find(r => r.id == requestId);
+    document.getElementById('deployToRoom').value = request ? request.room_id : '';
+    document.getElementById('deployToUser').value = request ? request.user_id : '';
 
-    document.getElementById('deployForm').addEventListener('submit', function (e) {
-        e.preventDefault();
+    // Display the modal by removing the "hidden" class
+    document.getElementById('deploymentModal').classList.remove('hidden');
+}
 
-        const formData = new FormData(this);
+function closeModal() {
+    // Hide the modal by adding the "hidden" class
+    document.getElementById('deploymentModal').classList.add('hidden');
+}
 
-        fetch('deploy_asset.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Asset deployed successfully');
-                closeModal();
-                location.reload();
-            } else {
-                alert('Error deploying asset: ' + data.message);
+    document.getElementById('downloadPdf').addEventListener('click', () => {
+        // Send an AJAX request to generate the PDF on the server
+        $.ajax({
+            url: 'generateInventory.php', // PHP script that generates the PDF
+            type: 'POST',
+            dataType: 'json', // Expect JSON response
+            success: function(response) {
+                if (response.success) {
+                    // If successful, you could handle success message here
+                    window.location.href = response.pdfUrl; // Redirect to the generated PDF URL
+                } else {
+                    alert('Error generating PDF');
+                }
+            },
+            error: function() {
+                alert('An error occurred while generating the PDF.');
             }
-        })
-        .catch(error => console.error('Error:', error));
+        });
     });
 </script>
 

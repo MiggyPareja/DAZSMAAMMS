@@ -29,7 +29,7 @@ $username = $user ? htmlspecialchars($user['username']) : 'Unknown User';
     FROM 
         categories c
     LEFT JOIN assets ar ON ar.category_id = c.id
-    LEFT JOIN generate_request_requests pr ON ar.person_in_charge_id = pr.person_in_charge_id
+    LEFT JOIN generate_request_requests pr ON ar.requested_by = pr.requested_by
         AND pr.status = 'Approved'
     GROUP BY 
         c.name;

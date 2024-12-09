@@ -27,7 +27,7 @@ $sql = "SELECT assets.id,
         JOIN sub_categories ON assets.sub_category_id = sub_categories.id
         LEFT JOIN rooms ON asset_records.room_id = rooms.id
         LEFT JOIN room_types ON rooms.room_type_id = room_types.id
-        LEFT JOIN persons_in_charge ON asset_records.person_in_charge_id = persons_in_charge.id
+        LEFT JOIN persons_in_charge ON asset_records.requested_by = persons_in_charge.id
         WHERE asset_records.id = '$request_id'";
 
 $stmt = $conn->prepare($sql);
