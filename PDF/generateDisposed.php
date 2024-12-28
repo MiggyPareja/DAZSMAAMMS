@@ -59,7 +59,7 @@ $html = '<table border="1" cellpadding="4">
     </thead>
     <tbody>';
 
-foreach ($deployed as $asset) {
+foreach ($disposed as $asset) {
     $html .= '<tr>
         <td>' . htmlspecialchars($asset['invID'] ?? 'N/A') . '</td>
         <td>' . htmlspecialchars($asset['inventoryName'] ?? 'N/A') . '</td>

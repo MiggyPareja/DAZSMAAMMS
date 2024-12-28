@@ -91,7 +91,7 @@ $deployedSQL = "SELECT
         JOIN brands ON brands.brand_id = inv.brand_id
         JOIN models ON models.model_id = inv.model_id
         JOIN departments ON departments.department_id = inv.department_id
-        JOIN users ON users.user_id = inv.requested_by
+        JOIN users ON users.id_number = inv.deployed_to
         JOIN categories c on c.category_id = inv.category_id
         JOIN subcategory s on s.subcategory_id = inv.subcategory_id
         JOIN rooms on rooms.room_id = inv.room_id
@@ -107,6 +107,7 @@ $deployed = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //disposed assets
 $disposedSQL = "SELECT 
+            inv.id as invId,
             inv.name as inventoryName,
             brands.brand_name as brandName,
             models.model_name as modelName,

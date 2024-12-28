@@ -76,13 +76,13 @@ require __DIR__ . '/../includes/db.php';
                         <div class="flex justify-center gap-2">
                             <button 
                                 class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" 
-                                onclick="updateStatus('<?php echo $request['id']; ?>', 'Approved')"
+                                onclick="updateStatus('<?php echo htmlspecialchars($request['id']); ?>', 'Approved')"
                             >
                                 Approve
                             </button>
                             <button 
                                 class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" 
-                                onclick="updateStatus('<?php echo $request['id']; ?>', 'Declined')"
+                                onclick="updateStatus('<?php echo htmlspecialchars($request['id']); ?>', 'Declined')"
                             >
                                 Decline
                             </button>
@@ -124,6 +124,18 @@ require __DIR__ . '/../includes/db.php';
             if (data.success) {
                 // Update the status in the table
                 document.getElementById(`status-${requestId}`).innerText = newStatus;
+
+                // Log the action
+                fetch('log_action.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        logType: newStatus === 'Approved' ? 'Approve Asset' : 'Decline Asset',
+                        performedBy: <?php echo json_encode($_SESSION['id_number']); ?> // Assuming the current user ID is stored in the session
+                    }),
+                });
             } else {
                 alert('Error updating status: ' + data.message);
             }

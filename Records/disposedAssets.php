@@ -29,7 +29,7 @@
         <!-- Flex container for the download button and search -->
         <div class="flex justify-between items-center mb-4">
             <!-- Download Button -->
-            <form action="../pdf/generateDeployed.php" method="post">
+            <form action="../pdf/generateDisposed.php" method="post">
                 <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">
                     Download PDF
                 </button>
@@ -47,6 +47,7 @@
                     <th class="px-6 py-3 font-semibold text-gray-700">Deployed at</th>
                     <th class="px-6 py-3 font-semibold text-gray-700">QR Code</th>
                     <th class="px-6 py-3 font-semibold text-gray-700">Status</th>
+                    <th class="px-6 py-3 font-semibold text-gray-700">Action</th> <!-- New column header -->
                 </tr>
             </thead>
             <tbody>
@@ -67,6 +68,12 @@
                         >
                     </td>
                     <td class="px-6 py-3"><?php echo htmlspecialchars($asset['status']); ?></td>
+                    <td class="px-6 py-3 text-center">
+                        <form action="redeploy_asset.php" method="post">
+                            <input type="hidden" name="asset_id" value="<?php echo $asset['invId']; ?>">
+                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Redeploy</button>
+                        </form>
+                    </td> <!-- New action button -->
                 </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -86,7 +93,3 @@
         });
     });
 </script>
-
-
-
-

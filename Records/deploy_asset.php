@@ -1,7 +1,10 @@
 <?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start(); // Start the session if not already started
+}
 
 require '../includes/db.php';
-require_once '../includes/phpqrcode/phpqrcode.php'; 
+require '../includes/phpqrcode/phpqrcode.php'; 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Fetch form data
@@ -9,6 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $roomId = $_POST['deployToRoom'];
     $deployedToUser = $_POST['deployToUser']; // The user to which the asset is deployed
     $comments = $_POST['comments'];
+
+    // Get session id_number
+    if (!isset($_SESSION['id_number'])) {
+        die('Session id_number not found.');
+    }
+    $sessionIdNumber = $_SESSION['id_number'];
 
     // Debugging: Check if the deployed_to value is coming through
     var_dump($deployedToUser); // Output deployed_to for debugging
@@ -26,102 +35,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$asset) {
         die('Asset not found.');
     }
+    $userid = $asset['deployed_to'].$asset['id'];
     $brandName = $asset['brand_name']; 
     $modelName = $asset['model_name']; 
     $deployedTo = $asset['deployed_to']; // This is the previously stored value
     $lastInspected = $asset['last_inspected'];
 
     // Get current date and time
-    $currentDateTime = date('Y-m-d H:i:s'); // Format: Year-Month-Day Hour:Minute:Second
+    $currentDateTime = date('Y-m-d'); // Format: Year-Month-Day Hour:Minute:Second
 
     // Generate unique name in the required format: brand_name + model_name + date/time
-    $uniqueName = $brandName . '- ' . $modelName . '- ' . $currentDateTime;
+    $uniqueName = $deployedToUser.'-'.$brandName . '- ' . $currentDateTime;
 
     // Update the inventory table first with the data
     $updateQuery = "UPDATE inventory 
-                    SET name = ?, 
-                        room_id = ?, 
-                        deployed_to = ?, 
-                        comments = ?, 
-                        status = 'Deployed'  
+                    SET name = ?, deployed_to = ?, room_id = ?, comments = ?, last_inspected = ?, status = ?
                     WHERE id = ?";
-    $stmt = $conn->prepare($updateQuery);
-    $stmt->execute([
-        $uniqueName,
-        $roomId,
-        $deployedToUser, // Ensure this is set correctly
-        $comments,
-        $requestId
-    ]);
+    $updateStmt = $conn->prepare($updateQuery);
+    $updateStmt->execute([$uniqueName, $deployedToUser, $roomId, $comments, $currentDateTime, 'deployed', $requestId]);
 
-    // Debugging: Check if the update query was successful
-    if ($stmt->rowCount() === 0) {
-        die("Error updating asset.");
-    }
+    // Insert into logs
+    $logQuery = "INSERT INTO logs (log_type, performed_by, log_date) VALUES (?, ?, ?)";
+    $logStmt = $conn->prepare($logQuery);
+    $logStmt->execute(['Deploy Asset', $sessionIdNumber, $currentDateTime]);
 
-    // Fetch the updated data from the database
-    $infoQuery = "SELECT subcategory.name as subcategoryName, categories.name as categoryName, rooms.name as roomName, rooms.room_type as roomType, inventory.* 
-    FROM inventory
-    LEFT JOIN models ON models.model_id = inventory.model_id
-    LEFT JOIN brands ON brands.brand_id = inventory.brand_id
-    LEFT JOIN rooms ON rooms.room_id = inventory.room_id
-    LEFT JOIN subcategory ON subcategory.subcategory_id = inventory.subcategory_id
-    LEFT JOIN categories ON categories.category_id = inventory.category_id
-    WHERE inventory.id = ?";  // Add the condition to filter by requestId
-
-    $stmt = $conn->prepare($infoQuery);
-    $stmt->execute([$requestId]);  // Pass requestId to execute
-    $info = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$info) {
-        var_dump($requestId); 
-        var_dump($info); 
-        die('QR not found.');
-    }
-
-    // Assign the necessary values for QR code generation
-    $categoryName = $info['categoryName'];
-    $subcategoryName = $info['subcategoryName'];
-    $roomName = $info['roomName']; 
-    $roomType = $info['roomType']; 
-
-    // Debugging: Check if the deployed_to value is correctly updated
-    $deployedTo = $info['deployed_to']; // Fetch the latest deployed_to value from the updated record
-    var_dump($deployedTo); // Debugging: Output deployed_to to confirm
-
-    // Generate the QR code data
-    $qrcodeData = "Category: " . $categoryName . "\n" . 
-                  "Sub-Category: " . $subcategoryName . "\n" . 
-                  "Room: " . $roomName . "\n" .
-                  "Room Type: " . $roomType . "\n" . 
-                  "Asset Name: " . $uniqueName . "\n" . 
-                  "Deployed to: " . $deployedTo . "\n" . // Make sure this is populated correctly
-                  "Comment: " . $comments . "\n" . 
-                  "Last Inspected: " . $lastInspected;
-
-    // Generate QR code (Make sure the folder exists and is writable)
-    $qrcodePath = '../qrcodes/' . $requestId . $categoryName . $subcategoryName . '.png';
-    QRcode::png($qrcodeData, $qrcodePath); 
-
-    // Convert QR code image to binary (Blob)
-    $qrcodeBlob = file_get_contents($qrcodePath);
-
-    // Now, update the inventory table with the QR code
-    $query = "UPDATE inventory 
-              SET qrcode = ? 
-              WHERE id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->execute([
-        $qrcodeBlob,
-        $requestId
-    ]);
-
-    if ($stmt->rowCount()) {
-        // Redirect back to the deployed_assets.php page
-        header('Location: deployed_assets.php'); 
-        exit();  // Make sure the script stops executing after the redirect
-    } else {
-        echo "Error updating asset QR code.";
-    }
+    // Redirect or perform other actions as needed
+    header('Location: add_assets.php');
+    exit();
 }
 ?>

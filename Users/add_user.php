@@ -1,88 +1,133 @@
 <?php
-// Include the database connection file
+
 require '../includes/db.php';
 
-// Check if the form is submitted using POST method
+// Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get form data
-    $username = trim($_POST['username']);
+    // Collect and sanitize form data
+    $id_number = trim($_POST['id_number']);
+    $user_username = trim($_POST['username']);
+    $email = trim($_POST['email']);
     $password = trim($_POST['password']);
     $role = $_POST['role'];
     $status = $_POST['status'];
-    $first_name = $_POST['first_name'];
-    $last_name = $_POST['last_name'];
-    $contact_number = $_POST['contact_number'];
-    $email = $_POST['email'];
+    $first_name = trim($_POST['first_name']);
+    $last_name = trim($_POST['last_name']);
+    $contact_number = trim($_POST['contact_number']);
     $birthdate = $_POST['birthdate'];
-    $id_number = $_POST['id_number'];
-    $department_id = $_POST['department_id'] ?? null; // Optional field, could be NULL
 
-    // Validation
-    $errors = [];
-    
-    if (empty($username)) {
-        $errors[] = "Username is required.";
-    }
-    if (empty($password)) {
-        $errors[] = "Password is required.";
-    }
-    if (empty($email)) {
-        $errors[] = "Email is required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Invalid email format.";
-    }
+    $errors = []; // Initialize an array to store error messages
+
+    // Validate ID Number
     if (empty($id_number)) {
-        $errors[] = "ID Number is required.";
+        $errors[] = 'ID Number is required.';
     }
-    // You can add more validation here as needed
-    
-    // Check for errors before proceeding with database insertion
-    if (empty($errors)) {
-        // Hash the password securely
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        // Prepare SQL query to insert user into the database
-        $sql = "INSERT INTO users (username, password, role, status, first_name, last_name, contact_number, email, birthdate, id_number, department_id) 
-                VALUES (:username, :password, :role, :status, :first_name, :last_name, :contact_number, :email, :birthdate, :id_number, :department_id)";
+    // Validate Username
+    if (empty($user_username)) {
+        $errors[] = 'Username is required.';
+    }
 
-        try {
-            // Prepare the statement using PDO
-            $stmt = $conn->prepare($sql);
+    // Validate Email
+    if (empty($email)) {
+        $errors[] = 'Email is required.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Invalid email format.';
+    }
 
-            // Bind parameters to the query
-            $stmt->bindParam(':username', $username);
-            $stmt->bindParam(':password', $hashed_password);
-            $stmt->bindParam(':role', $role);
-            $stmt->bindParam(':status', $status);
-            $stmt->bindParam(':first_name', $first_name);
-            $stmt->bindParam(':last_name', $last_name);
-            $stmt->bindParam(':contact_number', $contact_number);
-            $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':birthdate', $birthdate);
-            $stmt->bindParam(':id_number', $id_number);
-            $stmt->bindParam(':department_id', $department_id);
+    // Validate Password
+    if (empty($password)) {
+        $errors[] = 'Password is required.';
+    } elseif (strlen($password) < 6) {
+        $errors[] = 'Password must be at least 6 characters long.';
+    }
 
-            // Execute the query
-            if ($stmt->execute()) {
-                // Redirect to the manage users page with success status
-                header("Location: manage_users.php?status=success");
-                exit();
-            } else {
-                $errors[] = "Error executing query: " . $stmt->errorInfo()[2];
-            }
-        } catch (PDOException $e) {
-            $errors[] = "Error: " . $e->getMessage();
+    // Validate Contact Number (Optional, but you can apply a regex if needed)
+    if (!empty($contact_number) && !preg_match('/^\+?[0-9]{10,15}$/', $contact_number)) {
+        $errors[] = 'Invalid contact number format.';
+    }
+
+    // Validate Birthdate
+    if (empty($birthdate)) {
+        $errors[] = 'Birthdate is required.';
+    }
+
+    // Handle profile picture upload validation
+    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === 0) {
+        $file = $_FILES['profile_picture'];
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+        $max_file_size = 5 * 1024 * 1024; // 5MB max size
+
+        // Validate file type
+        if (!in_array($file['type'], $allowed_types)) {
+            $errors[] = 'Profile picture must be an image (JPG, PNG, GIF).';
+        }
+
+        // Validate file size
+        if ($file['size'] > $max_file_size) {
+            $errors[] = 'Profile picture must be less than 5MB.';
         }
     }
 
-    // Display errors if there are any
+    // If there are validation errors, display them and stop further processing
     if (!empty($errors)) {
-        foreach ($errors as $error) {
-            echo "<p style='color: red;'>$error</p>";
-        }
+        echo json_encode(['success' => false, 'errors' => $errors]);
+        exit; // Stop execution if there are errors
     }
-}
 
-// Close the database connection
-$conn = null;
+    // Proceed with data processing if no errors
+    $password_hashed = password_hash($password, PASSWORD_DEFAULT);
+
+    // Handle profile picture upload if valid
+    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === 0) {
+        $file_name = time() . '_' . $file['name']; // Generate unique file name
+        $file_tmp = $file['tmp_name'];
+        $file_dir = 'uploads/profile_pictures/';
+
+        if (!file_exists($file_dir)) {
+            mkdir($file_dir, 0777, true);
+        }
+
+        if (move_uploaded_file($file_tmp, $file_dir . $file_name)) {
+            // Profile picture uploaded successfully
+            $profile_picture = $file_name;
+        } else {
+            $profile_picture = null; // Set to null if upload fails
+        }
+    } else {
+        $profile_picture = null; // No file uploaded
+    }
+
+    // Save user data into the database (example)
+    $db = new mysqli($host, $username, '', $dbname);
+
+    if ($db->connect_error) {
+        die("Connection failed: " . $db->connect_error);
+    }
+
+    // Check for duplicate email
+    $query = "SELECT * FROM users WHERE email = '$email'";
+    $result = $db->query($query);
+
+    if ($result->num_rows > 0) {
+        echo json_encode(['success' => false, 'message' => 'Email already exists.']);
+        exit; // Stop execution if email already exists
+    }
+
+    // Insert user data into the database
+    $query = "INSERT INTO users (id_number, username, email, password, role, status, first_name, last_name, contact_number, birthdate, profile_picture) 
+              VALUES ('$id_number', '$user_username', '$email', '$password_hashed', '$role', '$status', '$first_name', '$last_name', '$contact_number', '$birthdate', '$profile_picture')";
+
+    if ($db->query($query)) {
+        // Redirect to user management page on success
+        header('Location: manage_users.php?message=User added successfully.');
+        exit; // Ensure no further code is executed after the redirect
+    } else {
+        // Handle database error
+        echo json_encode(['success' => false, 'message' => 'Error adding user to the database.']);
+    }
+
+    // Close DB connection
+    $db->close();
+}
 ?>

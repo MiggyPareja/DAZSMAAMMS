@@ -4,6 +4,11 @@ require __DIR__ . '/../includes/db.php';
 header('Content-Type: application/json');
 
 try {
+    // Check if the connection is established
+    if (!$conn) {
+        throw new Exception('Connection failed: ' . implode(', ', $conn->errorInfo()));
+    }
+
     // Decode JSON request
     $input = json_decode(file_get_contents('php://input'), true);
     if (!isset($input['requestId'], $input['newStatus'])) {

@@ -17,68 +17,75 @@
     </style>
 </head>
 
-<?php include '../sidebar.php'; ?>
-<?php include './deploy_asset.php'; ?>
+
 <?php include './fetch_requests.php'; ?>
+<div class="flex">
+    <!-- Sidebar -->
+    <?php include '../sidebar.php'; ?>
 
-<div class="flex-1 ml-64 p-4">
-    <div class="assets-table mt-8 p-4 rounded-lg bg-white">
-        <h1 class="text-2xl font-bold mb-4">Deployed Assets</h1>
+    <!-- Main Content -->
+    <div class="flex-1 p-4 ml-64 overflow-x-auto">
+        <div class="assets-table mt-8 p-4 rounded-lg bg-white shadow-md">
+            <h1 class="text-2xl font-bold mb-4">Deployed Assets</h1>
 
-        <!-- Flex container for the download button and search -->
-        <div class="flex justify-between items-center mb-4">
-            <!-- Download Button -->
-            <form action="../pdf/generateDeployed.php" method="post">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">
-                    Download PDF
-                </button>
-            </form>
+            <!-- Flex container for the download button and search -->
+            <div class="flex justify-between items-center mb-4">
+                <!-- Download Button -->
+                <form action="../pdf/generateDeployed.php" method="post">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">
+                        Download PDF
+                    </button>
+                </form>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table id="deployedAssetsTable" class="w-full table-auto border-separate border-spacing-2 text-left">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="border px-4 py-2">Asset ID</th>
+                            <th class="border px-4 py-2">Asset Name</th>
+                            <th class="border px-4 py-2">Brand</th>
+                            <th class="border px-4 py-2">Model</th>
+                            <th class="border px-4 py-2">Deployed to</th>
+                            <th class="border px-4 py-2">Deployed at</th>
+                            <th class="border px-4 py-2">QR Code</th>
+                            <th class="border px-4 py-2">Status</th>
+                            <th class="border px-4 py-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($deployed as $asset): ?>
+                        <tr class="hover:bg-gray-100">
+                            <td class="border px-4 py-2"><?php echo htmlspecialchars($asset['invID']); ?></td>
+                            <td class="border px-4 py-2"><?php echo htmlspecialchars($asset['inventoryName']); ?></td>
+                            <td class="border px-4 py-2"><?php echo htmlspecialchars($asset['brandName']); ?></td>
+                            <td class="border px-4 py-2"><?php echo htmlspecialchars($asset['modelName']); ?></td>
+                            <td class="border px-4 py-2"><?php echo htmlspecialchars($asset['lastName'] . ',' . $asset['firstName']); ?></td>
+                            <td class="border px-4 py-2"><?php echo htmlspecialchars($asset['roomName']); ?></td>
+                            <td class="border px-4 py-2">
+                                <img src="<?php echo $asset['qrcode'] ? 'data:image/png;base64,' . base64_encode($asset['qrcode']) : 'default-qr.png'; ?>" alt="QR Code" class="w-16 h-16 mx-auto">
+                            </td>
+                            <td class="border px-4 py-2"><?php echo htmlspecialchars($asset['status']); ?></td>
+                            <td class="border px-4 py-2">
+                                <!-- Buttons -->
+                                <button class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 inspect-btn" data-item-id="<?php echo htmlspecialchars($asset['invID']); ?>">Inspect</button>
+                                <form action="./disposeAsset.php" method="post" class="inline-block">
+                                    <input type="hidden" name="asset_id" value="<?php echo htmlspecialchars($asset['invID']); ?>">
+                                    <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Dispose</button>
+                                </form>
+                                <!-- Transfer Button -->
+                                <button class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 transfer-btn" data-asset-id="<?php echo htmlspecialchars($asset['invID']); ?>">Transfer</button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
-
-        <!-- Table displaying deployed assets -->
-        <table id="deployedAssetsTable" class="display w-full table-auto border-separate border-spacing-2">
-            <thead>
-                <tr>
-                    <th>Asset ID</th>
-                    <th>Asset Name</th>
-                    <th>Brand</th>
-                    <th>Model</th>
-                    <th>Deployed to</th>
-                    <th>Deployed at</th>
-                    <th>QR Code</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($deployed as $asset): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($asset['invID']); ?></td>
-                    <td><?php echo htmlspecialchars($asset['inventoryName']); ?></td>
-                    <td><?php echo htmlspecialchars($asset['brandName']); ?></td>
-                    <td><?php echo htmlspecialchars($asset['modelName']); ?></td>
-                    <td><?php echo htmlspecialchars($asset['lastName'] . ',' . $asset['firstName']); ?></td>
-                    <td><?php echo htmlspecialchars($asset['roomName']); ?></td>
-                    <td>
-                        <img src="<?php echo $asset['qrcode'] ? 'data:image/png;base64,' . base64_encode($asset['qrcode']) : 'default-qr.png'; ?>" alt="QR Code" class="w-16 h-16 mx-auto">
-                    </td>
-                    <td><?php echo htmlspecialchars($asset['status']); ?></td>
-                    <td>
-                        <!-- Pass asset ID instead of name -->
-                        <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 inspect-btn" data-item-id="<?php echo htmlspecialchars($asset['invID']); ?>">
-                            Inspect
-                        </button>
-                        <form action="./disposeAsset.php" method="post">
-                            <input type="hidden" name="asset_id" value="<?php echo htmlspecialchars($asset['invID']); ?>">
-                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Dispose</button>
-                        </form>
-                    </td>
-                </tr>
-                <?php endforeach; ?>    
-            </tbody>
-        </table>
     </div>
 </div>
+
 
 <!-- Modal HTML -->
 <div id="inspectionModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
@@ -86,8 +93,8 @@
         <h2 class="text-2xl font-bold mb-6">Inspection</h2>
         <form action="./inspectAssets.php" method="post">
             <div class="mb-6">
-                <label class="block text-lg font-medium mb-2" hidden>Item:</label>
-                <input type="text" name="item_id" class="w-full px-4 py-3 border rounded-md" value="TEST" readonly hidden>
+                <label class="block text-lg font-medium mb-2" hidden></label>
+                <input type="text" name="item_id" class="w-full px-4 py-3 border rounded-md" readonly hidden>
             </div>
             <!-- Item Name -->
             <div class="mb-6">
@@ -106,19 +113,40 @@
                 </select>
             </div>
             <!-- Adjusted Points -->
-            <div class="mb-6">
+            <div class="mb-6" hidden>
                 <label class="block text-lg font-medium mb-2">Adjusted Points:</label>
                 <input id="adjustedPoints" type="text" class="w-full px-4 py-3 border rounded-md bg-gray-100" value="0" readonly>
-            </div>
-            <!-- Inspection History -->
-            <div class="mb-6">
-                <label class="block text-lg font-medium mb-2">Inspection History:</label>
-                <textarea class="w-full px-4 py-3 border rounded-md bg-blue-100" rows="6" readonly>See more, refresh.</textarea>
             </div>
             <!-- Buttons -->
             <div class="flex justify-end space-x-4">
                 <button type="button" id="closeModal" class="bg-gray-500 text-white px-6 py-3 rounded-md hover:bg-gray-600">Cancel</button>
                 <button type="submit" class="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Transfer Modal -->
+<div id="transferModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg">
+        <h2 class="text-2xl font-bold mb-6">Transfer Asset</h2>
+        <form id="transferForm" action="./transferAsset.php" method="post">
+            <input type="hidden" name="asset_id" id="transferAssetId">
+            <!-- Add other form fields as needed -->
+            <div class="mb-4">
+                <label for="transferToUser" class="block text-sm font-medium text-gray-700">Transfer To:</label>
+                <select id="transferToUser" name="transferToUser" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">Select a User</option>
+                    <?php foreach ($users as $user): ?>
+                        <option value="<?php echo htmlspecialchars($user['id_number']); ?>">
+                            <?php echo htmlspecialchars($user['last_name'] . ', ' . $user['first_name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="flex justify-end">
+                <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mr-2" onclick="closeTransferModal()">Cancel</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit</button>
             </div>
         </form>
     </div>
@@ -149,7 +177,10 @@
     inspectButtons.forEach(button => {
         button.addEventListener('click', () => {
             const itemId = button.getAttribute('data-item-id');
+            const row = button.closest('tr');
+            const itemName = row.querySelector('td:nth-child(2)').textContent; // Get the asset name from the second column
             modal.querySelector('input[name="item_id"]').value = itemId;  // Pass ID to the form
+            modal.querySelector('input[name="item_name"]').value = itemName;  // Pass asset name to the form
             modal.classList.remove('hidden');
         });
     });
@@ -191,6 +222,17 @@
     });
 });
 
+document.querySelectorAll('.transfer-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const assetId = this.getAttribute('data-asset-id');
+        document.getElementById('transferAssetId').value = assetId;
+        document.getElementById('transferModal').classList.remove('hidden');
+    });
+});
+
+function closeTransferModal() {
+    document.getElementById('transferModal').classList.add('hidden');
+}
 </script>
 
 </html>

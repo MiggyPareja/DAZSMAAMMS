@@ -34,8 +34,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email']) && isset($_PO
         if ($user && password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['role'] = $user['role'];
+            $_SESSION['id_number'] = $user['id_number']; 
             $_SESSION['login_attempts'] = 0;
             $_SESSION['last_attempt_time'] = 0;
+
+            // Log the login
+            $log_sql = "INSERT INTO logs (log_type, performed_by, log_date) VALUES ('Login', :performed_by, NOW())";
+            $log_stmt = $conn->prepare($log_sql);
+            $log_stmt->bindParam(':performed_by', $user['id_number'], PDO::PARAM_STR);
+            $log_stmt->execute();
 
             header('Location: dashboard.php');
             exit();
@@ -46,6 +53,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email']) && isset($_PO
 
             if ($_SESSION['login_attempts'] >= $max_attempts) {
                 $error = "You failed to login 3 times. Please try again in $lockout_time seconds.";
+                $to = $username;
+                $subject = "Unsuccessful Login Attempts";
+                $message = "There have been multiple unsuccessful login attempts on your account. Please try again later.";
+                $headers = "From: no-reply@dazsma.com";
+
+                mail($to, $subject, $message, $headers);
+
+                // Log the unsuccessful login attempt
+                $log_sql = "INSERT INTO logs (log_type, performed_by, log_date) VALUES ('Failed Login', :performed_by, NOW())";
+                $log_stmt = $conn->prepare($log_sql);
+                $log_stmt->bindParam(':performed_by', $username, PDO::PARAM_STR);
+                $log_stmt->execute();
             } else {
                 $error = "The email or password you’ve entered is incorrect, attempts left: $attempts_left ";
             }
@@ -134,7 +153,22 @@ background-position: center;
                     LOG IN
                 </button>
                 <?php else: ?>
-                
+                    <p class="text-white">Please wait <span id="countdown"><?= $remaining_time ?></span> seconds before trying again.</p>
+                    <script>
+                        var remainingTime = <?= $remaining_time ?>;
+                        var countdownElement = document.getElementById('countdown');
+
+                        function updateCountdown() {
+                            if (remainingTime > 0) {
+                                remainingTime--;
+                                countdownElement.textContent = remainingTime;
+                            } else {
+                                location.reload();
+                            }
+                        }
+
+                        setInterval(updateCountdown, 1000);
+                    </script>
                 <?php endif; ?>
             </form>
         </div>
