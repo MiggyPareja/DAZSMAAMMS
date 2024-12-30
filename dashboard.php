@@ -49,12 +49,10 @@ $disposedRequests = $disposedRequestsStmt->fetch(PDO::FETCH_ASSOC)['disposed'];
 
 
 // Calculate durability and predictive analysis
-$durabilityQuery = "SELECT (DATEDIFF(COALESCE(dispose_date, NOW()), created_at) + inspector_points) - (YEAR(COALESCE(dispose_date, NOW())) - YEAR(created_at)) as durability FROM inventory";
+$durabilityQuery = "SELECT (DATEDIFF(COALESCE(dispose_date, NOW()), created_at) + inspector_points) - (YEAR(COALESCE(dispose_date, NOW())) - YEAR(created_at)) as durability FROM inventory WHERE status != 'disposed'";
 $durabilityStmt = $conn->prepare($durabilityQuery);
 $durabilityStmt->execute();
 $durabilities = $durabilityStmt->fetchAll(PDO::FETCH_ASSOC);
-
-
 
 $totalDurability = array_sum(array_column($durabilities, 'durability'));
 $totalAssets = count($durabilities);

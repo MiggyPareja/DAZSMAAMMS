@@ -93,20 +93,11 @@ $profile_picture = $user && !empty($user['profile_picture']) ? '../Users/uploads
                 </a>
             </div>
 
-            <!-- Collapsible Logs Section -->
-            <a class="flex items-center space-x-2 text-white hover:text-gray-300 cursor-pointer" id="logsBtn">
+            <!-- Replace Logs dropdown with direct link -->
+            <a href="../Records/logs.php" class="flex items-center space-x-2 text-white hover:text-gray-300">
                 <i class="fas fa-folder"></i>
                 <span>Logs</span>
-                <span id="logsArrow" class="ml-auto transform transition-transform">&#9660;</span>
             </a>
-            <div id="logsMenu" class="hidden flex flex-col p-2 space-y-3 pl-6">
-                <a href="../Records/activity_logs.php" class="text-white text-sm hover:text-gray-300">
-                    <i class="far fa-circle"></i> Activity Logs
-                </a>
-                <a href="../Records/transfer_logs.php" class="text-white text-sm hover:text-gray-300">
-                    <i class="far fa-circle"></i> Transfer Logs
-                </a>
-            </div>
 
             <!-- User Management -->
             <a href="../Users/manage_users.php" class="flex items-center space-x-2 text-white hover:text-gray-300">
@@ -156,13 +147,7 @@ $profile_picture = $user && !empty($user['profile_picture']) ? '../Users/uploads
             recordsArrow.classList.toggle('rotate-180');
         });
 
-        // Toggle functionality for Logs dropdown
-        document.getElementById('logsBtn').addEventListener('click', function () {
-            const logsMenu = document.getElementById('logsMenu');
-            const logsArrow = document.getElementById('logsArrow');
-            logsMenu.classList.toggle('hidden');
-            logsArrow.classList.toggle('rotate-180');
-        });
+        // Remove toggle functionality for Logs dropdown
 
         // Confirmation for log out
         function confirmLogout(event) {

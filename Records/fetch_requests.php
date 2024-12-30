@@ -115,7 +115,8 @@ $disposedSQL = "SELECT
             users.first_name as firstName,
             users.last_name as lastName,
             inv.qrcode,
-            inv.status
+            inv.status,
+            inv.dispose_date as disposed_date
         FROM inventory inv
         JOIN brands ON brands.brand_id = inv.brand_id
         JOIN models ON models.model_id = inv.model_id

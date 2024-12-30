@@ -46,8 +46,9 @@
                     <th class="px-6 py-3 font-semibold text-gray-700">Deployed to</th>
                     <th class="px-6 py-3 font-semibold text-gray-700">Deployed at</th>
                     <th class="px-6 py-3 font-semibold text-gray-700">QR Code</th>
+                    <th class="px-6 py-3 font-semibold text-gray-700">Disposed Date</th>
                     <th class="px-6 py-3 font-semibold text-gray-700">Status</th>
-                    <th class="px-6 py-3 font-semibold text-gray-700">Action</th> <!-- New column header -->
+                    <th class="px-6 py-3 font-semibold text-gray-700">Action</th> 
                 </tr>
             </thead>
             <tbody>
@@ -67,6 +68,7 @@
                             class="w-16 h-16 mx-auto"
                         >
                     </td>
+                    <td class="px-6 py-3"><?php echo htmlspecialchars($asset['disposed_date']); ?></td>
                     <td class="px-6 py-3"><?php echo htmlspecialchars($asset['status']); ?></td>
                     <td class="px-6 py-3 text-center">
                         <form action="redeploy_asset.php" method="post">

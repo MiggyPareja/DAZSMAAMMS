@@ -64,7 +64,7 @@
                             <td class="border px-4 py-2"><?php echo htmlspecialchars($asset['lastName'] . ',' . $asset['firstName']); ?></td>
                             <td class="border px-4 py-2"><?php echo htmlspecialchars($asset['roomName']); ?></td>
                             <td class="border px-4 py-2">
-                                <img src="<?php echo $asset['qrcode'] ? 'data:image/png;base64,' . base64_encode($asset['qrcode']) : 'default-qr.png'; ?>" alt="QR Code" class="w-16 h-16 mx-auto">
+                                <img src="<?php echo $asset['qrcode'] ? 'data:image/png;base64,' . base64_encode($asset['qrcode']) : 'default-qr.png'; ?>" alt="QR Code" class="w-16 h-16 mx-auto cursor-pointer qr-code">
                             </td>
                             <td class="border px-4 py-2"><?php echo htmlspecialchars($asset['status']); ?></td>
                             <td class="border px-4 py-2">
@@ -152,6 +152,14 @@
     </div>
 </div>
 
+<!-- QR Code Modal -->
+<div id="qrCodeModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-4">
+        <img id="qrCodeModalImg" src="" alt="QR Code" class="w-full h-full">
+        <button id="closeQrCodeModal" class="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Close</button>
+    </div>
+</div>
+
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 
@@ -233,6 +241,27 @@ document.querySelectorAll('.transfer-btn').forEach(button => {
 function closeTransferModal() {
     document.getElementById('transferModal').classList.add('hidden');
 }
+
+document.querySelectorAll('.qr-code').forEach(img => {
+    img.addEventListener('click', function() {
+        const qrCodeSrc = this.src;
+        const qrCodeModal = document.getElementById('qrCodeModal');
+        const qrCodeModalImg = document.getElementById('qrCodeModalImg');
+        qrCodeModalImg.src = qrCodeSrc;
+        qrCodeModal.classList.remove('hidden');
+    });
+});
+
+document.getElementById('closeQrCodeModal').addEventListener('click', function() {
+    document.getElementById('qrCodeModal').classList.add('hidden');
+});
+
+window.addEventListener('click', function(e) {
+    const qrCodeModal = document.getElementById('qrCodeModal');
+    if (e.target === qrCodeModal) {
+        qrCodeModal.classList.add('hidden');
+    }
+});
 </script>
 
 </html>
