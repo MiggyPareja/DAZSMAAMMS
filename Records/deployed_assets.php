@@ -76,6 +76,8 @@
                                 </form>
                                 <!-- Transfer Button -->
                                 <button class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 transfer-btn" data-asset-id="<?php echo htmlspecialchars($asset['invID']); ?>">Transfer</button>
+                                <!-- Recall Button -->
+                                <button class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 recall-btn" data-asset-id="<?php echo htmlspecialchars($asset['invID']); ?>">Recall</button>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -87,7 +89,7 @@
 </div>
 
 
-<!-- Modal HTML -->
+<!-- Inspect Modal -->
 <div id="inspectionModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
     <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <h2 class="text-2xl font-bold mb-6">Inspection</h2>
@@ -116,6 +118,11 @@
             <div class="mb-6" hidden>
                 <label class="block text-lg font-medium mb-2">Adjusted Points:</label>
                 <input id="adjustedPoints" type="text" class="w-full px-4 py-3 border rounded-md bg-gray-100" value="0" readonly>
+            </div>
+            <!-- Comment -->
+            <div class="mb-6">
+                <label class="block text-lg font-medium mb-2">Comment:</label>
+                <textarea name="comment" class="w-full px-4 py-3 border rounded-md" rows="4" placeholder="Enter your comments here..."></textarea>
             </div>
             <!-- Buttons -->
             <div class="flex justify-end space-x-4">
@@ -261,6 +268,26 @@ window.addEventListener('click', function(e) {
     if (e.target === qrCodeModal) {
         qrCodeModal.classList.add('hidden');
     }
+});
+
+// Recall button functionality
+document.querySelectorAll('.recall-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const assetId = this.getAttribute('data-asset-id');
+        $.ajax({
+            url: './recallAsset.php',
+            type: 'POST',
+            data: { asset_id: assetId },
+            success: function(response) {
+                alert('Asset status updated to Approved.');
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating asset status:', error);
+                alert('Failed to update asset status.');
+            }
+        });
+    });
 });
 </script>
 

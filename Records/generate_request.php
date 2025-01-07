@@ -22,7 +22,7 @@ require '../includes/db.php';
 
 <body class="bg-cover bg-center h-screen" style="background-image: linear-gradient(110deg, rgba(32, 32, 146, 0.55) 100%, #202092 45%), url('../images/Background.png');">
         
-<?php include '../sidebar.php'; ?>
+<?php include '../sidebar.php' ?>
 <?php include './generateRequest.php'; ?>
 <?php include './fetch_subcategories.php'; ?>
 
@@ -48,7 +48,7 @@ require '../includes/db.php';
             <?php endif; ?>
             
             <!-- Form Fields (Horizontal Layout) -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Department -->
                 <div>
                     <label for="department" class="block text-gray-700 font-medium">Department:</label>

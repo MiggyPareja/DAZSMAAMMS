@@ -75,8 +75,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
         $stmt->bindParam(':subcategory_id', $subcategory_id, PDO::PARAM_INT);
 
-        // Execute the statement and check if successful
-        if ($stmt->execute()) {
+        // Execute the statement multiple times based on the quantity
+        $conn->beginTransaction();
+        try {
+            for ($i = 0; $i < $quantity; $i++) {
+                $stmt->execute();
+            }
+            $conn->commit();
             $success = true; // Set success to true on successful insertion
 
             // Log the request
@@ -84,8 +89,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $log_stmt = $conn->prepare($log_sql);
             $log_stmt->bindParam(':performed_by', $current_user, PDO::PARAM_STR);
             $log_stmt->execute();
-        } else {
-            $error_message = $stmt->errorInfo()[2]; // Capture error message
+        } catch (Exception $e) {
+            $conn->rollBack();
+            $error_message = $e->getMessage(); // Capture error message
         }
     }
 

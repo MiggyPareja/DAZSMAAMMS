@@ -229,7 +229,12 @@
                                                 <label for="edit_birthdate" class="block text-sm font-medium text-gray-700">Birthdate</label>
                                                 <input type="date" id="edit_birthdate" name="birthdate" class="mt-1 w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
                                             </div>
-
+                                            <div class="mb-4">
+                                                <label for="edit_profile_picture" class="block text-sm font-medium text-gray-700">Profile Picture</label>
+                                                <input type="file" id="edit_profile_picture" name="profile_picture" accept="image/*" class="mt-1 w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                                <!-- Profile picture preview -->
+                                                <img id="edit_profile_picture_preview" class="mt-3 w-32 h-32 object-cover rounded-full hidden" src="" alt="Profile Picture Preview">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

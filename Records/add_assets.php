@@ -168,6 +168,18 @@
     document.getElementById('deployToRoom').value = request ? request.room_id : '';
     document.getElementById('deployToUser').value = request ? request.user_id : '';
 
+    // Automatically select the user in the "Requested By" field
+    if (request) {
+        const requestedBy = request.last_name + ', ' + request.first_name;
+        const deployToUserSelect = document.getElementById('deployToUser');
+        for (let i = 0; i < deployToUserSelect.options.length; i++) {
+            if (deployToUserSelect.options[i].text === requestedBy) {
+                deployToUserSelect.selectedIndex = i;
+                break;
+            }
+        }
+    }
+
     // Display the modal by removing the "hidden" class
     document.getElementById('deploymentModal').classList.remove('hidden');
 }

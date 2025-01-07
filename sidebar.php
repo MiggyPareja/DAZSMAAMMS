@@ -50,16 +50,17 @@ $profile_picture = $user && !empty($user['profile_picture']) ? '../Users/uploads
         <img src="../images/SYSTEM LOGO 2.png" alt="System Logo" class="text-white text-left">
     </div>
 
-    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-        <div class="image">
-            <img src="<?php echo $profile_picture; ?>" class="w-36 h-24 rounded-full" alt="User Image">
-        </div>
-        <div class="info">
-            <a href="#" class="d-block text-white text-lg font-semibold">
-                <?php echo $lastname . ', ' . $firstname; ?>
-            </a>
-        </div>
+  <div class="user-panel mt-3 mb-1 d-flex flex-column align-items-center">
+    <div class="image mb-2">
+        <img src="<?php echo htmlspecialchars($profile_picture, ENT_QUOTES, 'UTF-8'); ?>" class="w-24 h-24 rounded-full mx-auto" alt="User Image" onerror="this.onerror=null;this.src='/images/avatar.png';">
     </div>
+    <div class="info text-center">
+        <a href="#" class="d-block text-white text-lg font-semibold">
+            <?php echo $lastname . ', ' . $firstname; ?>
+        </a>
+    </div>
+    <hr class="border-t-2 border-white w-full my-2">
+</div>
 
     <nav class="flex flex-col space-y-4">
         <?php if ($role == 'Admin'): ?>
@@ -71,9 +72,9 @@ $profile_picture = $user && !empty($user['profile_picture']) ? '../Users/uploads
 
             <!-- Collapsible Assets Section -->
             <a class="flex items-center space-x-2 text-white hover:text-gray-300 cursor-pointer" id="recordsBtn">
-                <i class="fas fa-folder"></i>
+                <i class="fas fa-pencil"></i>
                 <span>Assets</span>
-                <span id="recordsArrow" class="ml-auto transform transition-transform">&#9660;</span>
+                <span id="recordsArrow" >&#9660;</span>
             </a>
             <div id="recordsMenu" class="hidden flex flex-col p-2 space-y-3 pl-6">
                 <a href="../Records/generate_request.php" class="text-white text-sm hover:text-gray-300">

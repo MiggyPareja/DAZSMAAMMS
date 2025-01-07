@@ -38,12 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Update query (with password handling)
         if (!empty($password)) {
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            $sql = "UPDATE users SET username=?, email=?, password=?, role=?, status=?, first_name=?, last_name=?, contact_number=?, birthdate=?, profile_picture=? WHERE id_number=?";
-            $stmt = $conn->prepare($sql);
+            // Hash the password before storing it
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $conn->prepare("UPDATE users SET username = ?, email = ?, password = ?, role = ?, status = ?, first_name = ?, last_name = ?, contact_number = ?, birthdate = ?, profile_picture = ? WHERE id_number = ?");
             $stmt->bindParam(1, $username);
             $stmt->bindParam(2, $email);
-            $stmt->bindParam(3, $hashedPassword);
+            $stmt->bindParam(3, $hashed_password);
             $stmt->bindParam(4, $role);
             $stmt->bindParam(5, $status);
             $stmt->bindParam(6, $first_name);
@@ -53,8 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->bindParam(10, $target_file);
             $stmt->bindParam(11, $id_number);
         } else {
-            $sql = "UPDATE users SET username=?, email=?, role=?, status=?, first_name=?, last_name=?, contact_number=?, birthdate=?, profile_picture=? WHERE id_number=?";
-            $stmt = $conn->prepare($sql);
+            $stmt = $conn->prepare("UPDATE users SET username = ?, email = ?, role = ?, status = ?, first_name = ?, last_name = ?, contact_number = ?, birthdate = ?, profile_picture = ? WHERE id_number = ?");
             $stmt->bindParam(1, $username);
             $stmt->bindParam(2, $email);
             $stmt->bindParam(3, $role);

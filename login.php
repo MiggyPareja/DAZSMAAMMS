@@ -135,7 +135,7 @@ background-position: center;
 </script>
 
         <div class="mt-8 flex space-x-4">
-            <p class="text-sm underline cursor-pointer">HELP</p>
+            <p class="text-sm underline cursor-pointer">User Manual</p>
         </div>
     </div>
     <div class="w-full max-w-sm bg-white bg-opacity-20 backdrop-blur-md p-8 rounded-3xl mr-20">

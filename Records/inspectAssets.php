@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Retrieve form data
         $item_id = isset($_POST['item_id']) ? trim($_POST['item_id']) : '';  // Item ID from the form
         $maintenance_type = isset($_POST['maintenance_type']) ? trim($_POST['maintenance_type']) : '';  // Maintenance type
+        $comment = isset($_POST['comment']) ? trim($_POST['comment']) : '';  // Comment
 
         // Map maintenance types to negative points based on form values
         $pointsMap = [
@@ -42,7 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $updateQuery = "UPDATE inventory 
-                        SET inspector_points = inspector_points + :points 
+                        SET inspector_points = inspector_points + :points, 
+                            comments= :comment 
                         WHERE id = :item_id";  // Use invID to find the asset
         $updateStmt = $conn->prepare($updateQuery);
 
@@ -54,21 +56,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Execute the query
         $updateStmt->execute([
             ':points' => $points,
+            ':comment' => $comment,
             ':item_id' => $item_id,  // Bind the item ID instead of the name
         ]);
 
         // Check if the update was successful
         if ($updateStmt->rowCount() > 0) {
             // Insert into logs
-            $logQuery = "INSERT INTO logs (log_type, performed_by, log_date) VALUES (?, ?, ?)";
+            $logQuery = "INSERT INTO logs (log_type, performed_by) VALUES (?, ?)";
             $logStmt = $conn->prepare($logQuery);
-            $logStmt->execute(['Inspect Asset', $_SESSION['id_number'], date('Y-m-d H:i:s')]);
+
+            // Check for errors in the query preparation
+            if (!$logStmt) {
+                throw new Exception('Log query preparation failed: ' . implode(', ', $conn->errorInfo()));
+            }
+
+            // Execute the log query
+            $logStmt->execute(['Inspect Asset', $sessionIdNumber]);
+
+            // Check if the log insertion was successful
+            if ($logStmt->rowCount() > 0) {
+                echo 'Update and log insertion successful.';
+            } else {
+                throw new Exception('Log insertion failed.');
+            }
 
             // Successful update
             header('Location: deployed_assets.php');
             exit();
         } else {
-            // No rows were updated, check if the item_id exists
+            header('Location: deployed_assets.php');
             throw new Exception('Error: No rows were updated. Ensure the item ID exists in the database.');
         }
 

@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $logStmt->execute(['Deploy Asset', $sessionIdNumber, $currentDateTime]);
 
     // Fetch the updated data from the database
-    $infoQuery = "SELECT subcategory.name as subcategoryName, categories.name as categoryName, rooms.name as roomName, rooms.room_type as roomType, inventory.* 
+    $infoQuery = "SELECT inventory.name as deviceName, subcategory.name as subcategoryName, categories.name as categoryName, rooms.name as roomName, rooms.room_type as roomType, inventory.* 
     FROM inventory
     LEFT JOIN models ON models.model_id = inventory.model_id
     LEFT JOIN brands ON brands.brand_id = inventory.brand_id
@@ -89,13 +89,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subcategoryName = $info['subcategoryName'];
     $roomName = $info['roomName']; 
     $roomType = $info['roomType']; 
+    $deviceName = $info['deviceName']; 
 
     // Debugging: Check if the deployed_to value is correctly updated
     $deployedTo = $info['deployed_to']; // Fetch the latest deployed_to value from the updated record
     var_dump($deployedTo); // Debugging: Output deployed_to to confirm
 
     // Generate the QR code data
-    $qrcodeData = "Category: " . $categoryName . "\n" . 
+    $qrcodeData = "Device Name: " . $deviceName . "\n" . 
+                  "Category: " . $categoryName . "\n" . 
                   "Sub-Category: " . $subcategoryName . "\n" . 
                   "Room: " . $roomName . "\n" .
                   "Room Type: " . $roomType . "\n" . 
@@ -104,8 +106,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   "Comment: " . $comments . "\n" . 
                   "Last Inspected: " . $lastInspected;
 
+    // Sanitize category and subcategory names for file path
+    $sanitizedCategoryName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $categoryName);
+    $sanitizedSubcategoryName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $subcategoryName);
+
     // Generate QR code (Make sure the folder exists and is writable)
-    $qrcodePath = '../qrcodes/' . $requestId . $categoryName . $subcategoryName . '.png';
+    $qrcodePath = '../qrcodes/' . $requestId . $sanitizedCategoryName . $sanitizedSubcategoryName . '.png';
     QRcode::png($qrcodeData, $qrcodePath); 
 
     // Convert QR code image to binary (Blob)

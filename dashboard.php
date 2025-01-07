@@ -40,6 +40,11 @@ $pendingRequestsStmt = $conn->prepare($pendingRequestsQuery);
 $pendingRequestsStmt->execute();
 $pendingRequests = $pendingRequestsStmt->fetch(PDO::FETCH_ASSOC)['pending'];
 
+$approvedRequestsQuery = "SELECT COUNT(*) as approved FROM inventory WHERE status = 'Approved'";
+$approvedRequestsStmt = $conn->prepare($approvedRequestsQuery);
+$approvedRequestsStmt->execute();
+$approvedRequests = $approvedRequestsStmt->fetch(PDO::FETCH_ASSOC)['approved'];
+
 
 $disposedRequestsQuery = "SELECT COUNT(*) as disposed FROM inventory WHERE status = 'Disposed'";
 $disposedRequestsStmt = $conn->prepare($disposedRequestsQuery);
@@ -82,7 +87,27 @@ $chartData = [
 // Ensure that variables are defined and sanitized
 $totalAssets = isset($totalAssets) ? htmlspecialchars($totalAssets) : 0;
 $deployedAssets = isset($deployedAssets) ? htmlspecialchars($deployedAssets) : 0;
+$disposedAssets = isset($disposedAssets) ? htmlspecialchars($disposedAssets) : 0;
 $pendingRequests = isset($pendingRequests) ? htmlspecialchars($pendingRequests) : 0;
+$approvedRequests = isset($approvedRequests) ? htmlspecialchars($approvedRequests) : 0;
+
+// Fetch categories for dropdown
+$categoriesQuery = "SELECT category_id, name FROM categories";
+$categoriesStmt = $conn->prepare($categoriesQuery);
+$categoriesStmt->execute();
+$categories = $categoriesStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch subcategories for dropdown
+$subcategoriesQuery = "SELECT subcategory_id, name FROM subcategory";
+$subcategoriesStmt = $conn->prepare($subcategoriesQuery);
+$subcategoriesStmt->execute();
+$subcategories = $subcategoriesStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch brands for dropdown
+$brandsQuery = "SELECT brand_id, brand_name FROM brands";
+$brandsStmt = $conn->prepare($brandsQuery);
+$brandsStmt->execute();
+$brands = $brandsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 <!DOCTYPE html>
@@ -92,9 +117,11 @@ $pendingRequests = isset($pendingRequests) ? htmlspecialchars($pendingRequests) 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DAZSMA Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
@@ -172,13 +199,145 @@ $pendingRequests = isset($pendingRequests) ? htmlspecialchars($pendingRequests) 
                     <p class="text-4xl mt-2 font-semibold"><?php echo $pendingRequests; ?></p>
                 </div>
             </div>
-            <!-- This -->
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
                 <div class="bg-gray-100 p-6 rounded-lg shadow">
                     <h3 class="text-lg font-semibold">Add Categories and Sub-categories</h3>
+                    <button class="mt-4 bg-blue-500 text-white py-2 px-4 rounded" data-toggle="modal" data-target="#addCategoryModal"> <i class = "fas fa-plus"></i> Add Categories</button>
+                    <button class="mt-4 bg-blue-500 text-white py-2 px-4 rounded" data-toggle="modal" data-target="#addSubCategoryModal"> <i class = "fas fa-plus"></i> Add Sub-Categories</button>
                 </div>
                 <div class="bg-gray-100 p-6 rounded-lg shadow">
                     <h3 class="text-lg font-semibold">Add Brand and Model</h3>
+                    <button class="mt-4 bg-blue-500 text-white py-2 px-4 rounded" data-toggle="modal" data-target="#addBrandModal"> <i class = "fas fa-plus"></i> Add Brand</button>
+                    <button class="mt-4 bg-blue-500 text-white py-2 px-4 rounded" data-toggle="modal" data-target="#addModelModal"> <i class = "fas fa-plus"></i> Add Model</button>
+                </div>
+            </div>
+
+            <!-- Add Category Modal -->
+            <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="insert_values.php" method="post">
+                                <input type="hidden" name="type" value="category">
+                                <div class="form-group">
+                                    <label for="categoryName">Category Name</label>
+                                    <input type="text" class="form-control" id="categoryName" name="name" placeholder="Enter category name">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Sub-Category Modal -->
+            <div class="modal fade" id="addSubCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addSubCategoryModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addSubCategoryModalLabel">Add Sub-Category</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="insert_values.php" method="post">
+                                <input type="hidden" name="type" value="subcategory">
+                                <div class="form-group">
+                                    <label for="subCategoryName">Sub-Category Name</label>
+                                    <input type="text" class="form-control" id="subCategoryName" name="name" placeholder="Enter sub-category name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="categoryId">Category</label>
+                                    <select class="form-control" id="categoryId" name="category_id">
+                                        <?php foreach ($categories as $category): ?>
+                                            <option value="<?php echo htmlspecialchars($category['category_id']); ?>">
+                                                <?php echo htmlspecialchars($category['name']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Brand Modal -->
+            <div class="modal fade" id="addBrandModal" tabindex="-1" role="dialog" aria-labelledby="addBrandModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addBrandModalLabel">Add Brand</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="insert_values.php" method="post">
+                                <input type="hidden" name="type" value="brand">
+                                <div class="form-group">
+                                    <label for="brandName">Brand Name</label>
+                                    <input type="text" class="form-control" id="brandName" name="name" placeholder="Enter brand name">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Model Modal -->
+            <div class="modal fade" id="addModelModal" tabindex="-1" role="dialog" aria-labelledby="addModelModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addModelModalLabel">Add Model</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="insert_values.php" method="post">
+                                <input type="hidden" name="type" value="model">
+                                <div class="form-group">
+                                    <label for="modelName">Model Name</label>
+                                    <input type="text" class="form-control" id="modelName" name="name" placeholder="Enter model name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="brandId">Brand</label>
+                                    <select class="form-control" id="brandId" name="brand_id">
+                                        <?php foreach ($brands as $brand): ?>
+                                            <option value="<?php echo htmlspecialchars($brand['brand_id']); ?>">
+                                                <?php echo htmlspecialchars($brand['brand_name']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -192,13 +351,9 @@ $pendingRequests = isset($pendingRequests) ? htmlspecialchars($pendingRequests) 
                     <div class="flex justify-between items-center mb-4">
                         <form action="../records/updateDurability.php" method="post">
                             <div class="flex items-center">
-                                <select name="filter" class="bg-gray-200 text-gray-700 px-4 py-2 rounded mr-4">
-                                    <option value="all">All</option>
-                                    <option value="category">Category</option>
-                                    <option value="subcategory">Subcategory</option>
-                                </select>
+                                
                                 <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300">
-                                    Update Durability
+                                  <i class = "fas fa-refresh"></i>  Update Durability
                                 </button>
                             </div>
                         </form>
@@ -214,11 +369,11 @@ $pendingRequests = isset($pendingRequests) ? htmlspecialchars($pendingRequests) 
                     // Assets Distribution Chart options
                     const assetsDistributionOptions = {
                         series: [
-                            <?php echo isset($deployedAssets) ? $deployedAssets : 0; ?>,
-                            <?php echo isset($totalAssets) && isset($deployedAssets) && isset($disposedAssets) && isset($pendingAssets) ? 
-                                ($totalAssets - $deployedAssets - $disposedAssets - $pendingAssets) : 0; ?>,
-                            <?php echo isset($disposedAssets) ? $disposedAssets : 0; ?>,
-                            <?php echo isset($pendingAssets) ? $pendingAssets : 0; ?>
+                            <?php echo $deployedAssets; ?>,
+                            <?php echo $totalAssets - $deployedAssets - $disposedAssets - $pendingRequests - $approvedRequests; ?>,
+                            <?php echo $disposedAssets; ?>,
+                            <?php echo $pendingRequests; ?>,
+                            <?php echo $approvedRequests; ?>
                         ],
                         chart: {
                             type: 'pie',
@@ -231,8 +386,8 @@ $pendingRequests = isset($pendingRequests) ? htmlspecialchars($pendingRequests) 
                             text: 'Assets Distribution',
                             align: 'center'
                         },
-                        labels: ['Deployed', 'In Stock', 'Disposed', 'Pending'],
-                        colors: ['#34D399', '#60A5FA', '#EF4444', '#FBBF24'], // Green, Blue, Red, Yellow
+                        labels: ['Deployed', 'In Stock', 'Disposed', 'Pending', 'Approved'],
+                        colors: ['#34D399', '#60A5FA', '#EF4444', '#FBBF24', '#A78BFA'], // Green, Blue, Red, Yellow, Purple
                         legend: {
                             position: 'bottom'
                         },
