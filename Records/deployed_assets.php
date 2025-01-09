@@ -29,7 +29,7 @@
             <h1 class="text-2xl font-bold mb-4">Deployed Assets</h1>
 
             <!-- Flex container for the download button and search -->
-            <div class="flex justify-between items-center mb-4">
+            <div class="flex justify-between items-center mb-4 space-y-4"> 
                 <!-- Download Button -->
                 <form action="../pdf/generateDeployed.php" method="post">
                     <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">
@@ -147,6 +147,18 @@
                     <?php foreach ($users as $user): ?>
                         <option value="<?php echo htmlspecialchars($user['id_number']); ?>">
                             <?php echo htmlspecialchars($user['last_name'] . ', ' . $user['first_name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <!-- Rooms Dropdown -->
+            <div class="mb-4">
+                <label for="transferToRoom" class="block text-sm font-medium text-gray-700">Transfer To Room:</label>
+                <select id="transferToRoom" name="transferToRoom" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">Select a Room</option>
+                    <?php foreach ($rooms as $room): ?>
+                        <option value="<?php echo htmlspecialchars($room['room_id']); ?>">
+                            <?php echo htmlspecialchars($room['name']); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>

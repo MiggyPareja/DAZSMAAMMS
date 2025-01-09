@@ -45,7 +45,7 @@ $profile_picture = $user && !empty($user['profile_picture']) ? '../Users/uploads
 
 <body class="bg-cover bg-center h-screen" style="background-image: linear-gradient(110deg, rgba(32, 32, 146, 0.55) 100%, #202092 45%), url('../images/Background.png');">
 
-    <div class="bg-blue-900 w-64 flex flex-col p-4 fixed h-full space-y-4 z-20">
+    <div class="bg-blue-900 w-64 flex flex-col p-2 fixed h-full space-y-4 z-20">
     <div class="image">
         <img src="../images/SYSTEM LOGO 2.png" alt="System Logo" class="text-white text-left">
     </div>

@@ -202,16 +202,44 @@ $brands = $brandsStmt->fetchAll(PDO::FETCH_ASSOC);
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
                 <div class="bg-gray-100 p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold">Add Categories and Sub-categories</h3>
-                    <button class="mt-4 bg-blue-500 text-white py-2 px-4 rounded" data-toggle="modal" data-target="#addCategoryModal"> <i class = "fas fa-plus"></i> Add Categories</button>
-                    <button class="mt-4 bg-blue-500 text-white py-2 px-4 rounded" data-toggle="modal" data-target="#addSubCategoryModal"> <i class = "fas fa-plus"></i> Add Sub-Categories</button>
+                    <h3 class="text-lg font-semibold">Add Constants</h3>
+                    <button class="mt-4 bg-blue-500 text-white py-2 px-4 rounded" data-toggle="modal" data-target="#addCategoryModal"> 
+                        <i class="fas fa-plus"></i> Add Category
+                    </button>
+                    <button class="mt-4 bg-blue-500 text-white py-2 px-4 rounded" data-toggle="modal" data-target="#addSubCategoryModal"> 
+                        <i class="fas fa-plus"></i> Add Sub-Category
+                    </button>
+                    <button class="mt-4 bg-blue-500 text-white py-2 px-4 rounded" data-toggle="modal" data-target="#addBrandModal"> 
+                        <i class="fas fa-plus"></i> Add Brand
+                    </button>
+                    <button class="mt-4 bg-blue-500 text-white py-2 px-4 rounded" data-toggle="modal" data-target="#addModelModal"> 
+                        <i class="fas fa-plus"></i> Add Model
+                    </button>
                 </div>
                 <div class="bg-gray-100 p-6 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold">Add Brand and Model</h3>
-                    <button class="mt-4 bg-blue-500 text-white py-2 px-4 rounded" data-toggle="modal" data-target="#addBrandModal"> <i class = "fas fa-plus"></i> Add Brand</button>
-                    <button class="mt-4 bg-blue-500 text-white py-2 px-4 rounded" data-toggle="modal" data-target="#addModelModal"> <i class = "fas fa-plus"></i> Add Model</button>
+                    <h3 class="text-lg font-semibold mb-4">Extract all Deployed Assets from User</h3>
+                    <form action="extract_assets.php" method="post" class="flex items-center space-x-4">
+                        <div class="form-group flex-grow">
+                            <label for="userId" class="sr-only">Select User</label>
+                            <select class="form-control py-2 px-2" id="userId" name="user_id">
+                                <?php
+                                    $usersQuery = "SELECT user_id, username FROM users";
+                                    $usersStmt = $conn->prepare($usersQuery);
+                                    $usersStmt->execute();
+                                    $users = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
+                                    foreach ($users as $user) {
+                                        echo '<option value="' . htmlspecialchars($user['user_id']) . '">' . htmlspecialchars($user['username']) . '</option>';
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white py-2 px-2 mb-2 rounded">
+                            Extract Assets
+                        </button>
+                    </form>
                 </div>
             </div>
+            
 
             <!-- Add Category Modal -->
             <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
@@ -370,7 +398,6 @@ $brands = $brandsStmt->fetchAll(PDO::FETCH_ASSOC);
                     const assetsDistributionOptions = {
                         series: [
                             <?php echo $deployedAssets; ?>,
-                            <?php echo $totalAssets - $deployedAssets - $disposedAssets - $pendingRequests - $approvedRequests; ?>,
                             <?php echo $disposedAssets; ?>,
                             <?php echo $pendingRequests; ?>,
                             <?php echo $approvedRequests; ?>
@@ -386,8 +413,8 @@ $brands = $brandsStmt->fetchAll(PDO::FETCH_ASSOC);
                             text: 'Assets Distribution',
                             align: 'center'
                         },
-                        labels: ['Deployed', 'In Stock', 'Disposed', 'Pending', 'Approved'],
-                        colors: ['#34D399', '#60A5FA', '#EF4444', '#FBBF24', '#A78BFA'], // Green, Blue, Red, Yellow, Purple
+                        labels: ['Deployed','Disposed', 'Pending', 'In Stock'],
+                        colors: ['#34D399','#EF4444', '#FBBF24', '#60A5FA'],
                         legend: {
                             position: 'bottom'
                         },

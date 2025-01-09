@@ -46,7 +46,6 @@
                     <th>Department</th>
                     <th>Request Date</th>
                     <th>Requested By</th>
-                    <th>Quantity</th>
                     <th>Unit Cost</th>
                     <th>Brand</th>
                     <th>Model</th>
@@ -66,7 +65,6 @@
                     <td><?php echo htmlspecialchars($request['department_name']); ?></td>
                     <td><?php echo htmlspecialchars($request['created_at']); ?></td>
                     <td><?php echo htmlspecialchars($request['last_name'].','.$request['first_name']); ?></td>
-                    <td><?php echo htmlspecialchars($request['quantity']); ?></td>
                     <td><?php echo htmlspecialchars($request['unit_cost']); ?></td>
                     <td><?php echo htmlspecialchars($request['brand_name']); ?></td>
                     <td><?php echo htmlspecialchars($request['model_name']); ?></td>

@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email']) && isset($_PO
             $_SESSION['last_attempt_time'] = 0;
 
             // Log the login
-            $log_sql = "INSERT INTO logs (log_type, performed_by, log_date) VALUES ('Login', :performed_by, NOW())";
+            $log_sql = "INSERT INTO logs (log_type, performed_by) VALUES ('Login', :performed_by)";
             $log_stmt = $conn->prepare($log_sql);
             $log_stmt->bindParam(':performed_by', $user['id_number'], PDO::PARAM_STR);
             $log_stmt->execute();

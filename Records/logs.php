@@ -29,6 +29,11 @@ include '../includes/db.php';
 $stmt = $conn->prepare("SELECT * FROM logs ORDER BY log_date DESC");
 $stmt->execute();
 $action_logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch transfer history from the database with inventory details
+$transferStmt = $conn->prepare("SELECT th.*, r1.name AS from_room, r2.name AS to_room, i.name as invName FROM transfer_history th LEFT JOIN rooms r1 ON th.from_room_id = r1.room_id LEFT JOIN rooms r2 ON th.to_room_id = r2.room_id LEFT JOIN inventory i ON th.asset_id = i.id ORDER BY th.transfer_date DESC");
+$transferStmt->execute();
+$transfer_logs = $transferStmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <div class="flex-1 ml-64 p-4">
@@ -68,6 +73,36 @@ $action_logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <!-- Second Div -->
             <div class="w-1/2 p-4 bg-gray-100 rounded-lg shadow-md">
                 <h2 class="text-xl font-semibold mb-2">Transfer Logs</h2>
+                <table id="transferLogsTable" class="min-w-full bg-white">
+                    <thead>
+                        <tr>
+                            <th class="py-2">Date</th>
+                            <th class="py-2">Asset ID</th>
+                            <th class="py-2">Asset Name</th>
+                            <th class="py-2">From Room</th>
+                            <th class="py-2">To Room</th>
+                            <th class="py-2">Updated By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($transfer_logs)): ?>
+                            <?php foreach ($transfer_logs as $log): ?>
+                                <tr>
+                                    <td class="border px-4 py-2"><?php echo htmlspecialchars($log['transfer_date'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td class="border px-4 py-2"><?php echo htmlspecialchars($log['asset_id'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td class="border px-4 py-2"><?php echo htmlspecialchars($log['invName'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td class="border px-4 py-2"><?php echo htmlspecialchars($log['from_room'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td class="border px-4 py-2"><?php echo htmlspecialchars($log['to_room'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td class="border px-4 py-2"><?php echo htmlspecialchars($log['updated_by'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="6" class="border px-4 py-2 text-center">No transfer logs found</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -81,6 +116,9 @@ $action_logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <script>
     $(document).ready(function() {
         $('#actionLogsTable').DataTable({
+            "order": [[0, "desc"]] // Order by the first column (Date) in descending order
+        });
+        $('#transferLogsTable').DataTable({
             "order": [[0, "desc"]] // Order by the first column (Date) in descending order
         });
     });
