@@ -218,18 +218,18 @@ $brands = $brandsStmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="bg-gray-100 p-6 rounded-lg shadow">
                     <h3 class="text-lg font-semibold mb-4">Extract all Deployed Assets from User</h3>
-                    <form action="extract_assets.php" method="post" class="flex items-center space-x-4">
+                    <form action="/PDF/extract_assets.php" method="post" class="flex items-center space-x-4">
                         <div class="form-group flex-grow">
                             <label for="userId" class="sr-only">Select User</label>
                             <select class="form-control py-2 px-2" id="userId" name="user_id">
                                 <?php
-                                    $usersQuery = "SELECT user_id, username FROM users";
+                                    $usersQuery = "SELECT * FROM users";
                                     $usersStmt = $conn->prepare($usersQuery);
                                     $usersStmt->execute();
                                     $users = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
                                     foreach ($users as $user) {
-                                        echo '<option value="' . htmlspecialchars($user['user_id']) . '">' . htmlspecialchars($user['username']) . '</option>';
-                                }
+                                        echo '<option value="' . htmlspecialchars($user['id_number'], ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8') . '</option>';
+                                    }
                                 ?>
                             </select>
                         </div>

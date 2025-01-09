@@ -26,12 +26,12 @@
 include '../includes/db.php';
 
 // Fetch action logs from the database excluding disposed items
-$stmt = $conn->prepare("SELECT * FROM logs ORDER BY log_date DESC");
+$stmt = $conn->prepare("SELECT * FROM logs ORDER BY log_id DESC");
 $stmt->execute();
 $action_logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch transfer history from the database with inventory details
-$transferStmt = $conn->prepare("SELECT th.*, r1.name AS from_room, r2.name AS to_room, i.name as invName FROM transfer_history th LEFT JOIN rooms r1 ON th.from_room_id = r1.room_id LEFT JOIN rooms r2 ON th.to_room_id = r2.room_id LEFT JOIN inventory i ON th.asset_id = i.id ORDER BY th.transfer_date DESC");
+// Fetch transfer history from the database with inventory details and user details
+$transferStmt = $conn->prepare("SELECT th.*, r1.name AS from_room, r2.name AS to_room, i.name as invName, u.username AS userName FROM transfer_history th LEFT JOIN rooms r1 ON th.from_room_id = r1.room_id LEFT JOIN rooms r2 ON th.to_room_id = r2.room_id LEFT JOIN inventory i ON th.asset_id = i.id LEFT JOIN users u ON th.updated_by = u.id_number ORDER BY th.transfer_date DESC");
 $transferStmt->execute();
 $transfer_logs = $transferStmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -47,6 +47,7 @@ $transfer_logs = $transferStmt->fetchAll(PDO::FETCH_ASSOC);
                 <table id="actionLogsTable" class="min-w-full bg-white">
                     <thead>
                         <tr>
+                            <th class="py-2">ID</th>
                             <th class="py-2">Date</th>
                             <th class="py-2">Type</th>
                             <th class="py-2">Performed By</th>
@@ -56,6 +57,7 @@ $transfer_logs = $transferStmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php if (!empty($action_logs)): ?>
                             <?php foreach ($action_logs as $log): ?>
                                 <tr>
+                                    <td class="border px-4 py-2"><?php echo htmlspecialchars($log['log_id'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td class="border px-4 py-2"><?php echo htmlspecialchars($log['log_date'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td class="border px-4 py-2"><?php echo htmlspecialchars($log['log_type'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td class="border px-4 py-2"><?php echo htmlspecialchars($log['performed_by'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -93,7 +95,7 @@ $transfer_logs = $transferStmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td class="border px-4 py-2"><?php echo htmlspecialchars($log['invName'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td class="border px-4 py-2"><?php echo htmlspecialchars($log['from_room'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td class="border px-4 py-2"><?php echo htmlspecialchars($log['to_room'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td class="border px-4 py-2"><?php echo htmlspecialchars($log['updated_by'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td class="border px-4 py-2"><?php echo htmlspecialchars($log['userName'], ENT_QUOTES, 'UTF-8'); ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
